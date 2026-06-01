@@ -66,7 +66,7 @@ User receives notification of decision
 1. **Clone the repository**
 ```bash
 git clone https://github.com/wisdomlordBM/job-portal-mvc.git
-cd NewRepo/Jobportalwebsite
+cd job-portal-mvc/Jobportalwebsite
 ```
 
 2. **Update the connection string** in `appsettings.json`
