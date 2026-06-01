@@ -65,7 +65,7 @@ User receives notification of decision
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/wisdomlordBM/NewRepo.git
+git clone https://github.com/wisdomlordBM/job-portal-mvc.git
 cd NewRepo/Jobportalwebsite
 ```
 
