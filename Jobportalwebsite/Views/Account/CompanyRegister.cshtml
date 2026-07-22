@@ -30,6 +30,18 @@
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
 
+                <div class="mb-3">
+                    <label asp-for="CountryId" class="form-label">Country</label>
+                    <select asp-for="CountryId" class="form-control">
+                        <option value="">Select your country</option>
+                        @foreach (Country country in ViewBag.Countries)
+                        {
+                            <option value="@country.Id">@country.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                </div>
+
                 <div class="d-grid mb-3">
                     <button type="submit" class="btn btn-primary">Register</button>
                 </div>
@@ -38,50 +50,34 @@
                     Already registered? <a href="@Url.Action("Login", "Account")" class="text-decoration-none">Go to Login</a>
                 </p>
             </form>
+            <!-- Other form content -->
+
+            <div class="text-center mt-4">
+                <p>Or login with:</p>
+                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                    <input type="hidden" name="provider" value="Google" />
+                    <input type="hidden" name="role" value="Company" />
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                </form>
+                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                    <input type="hidden" name="provider" value="Facebook" />
+                    <input type="hidden" name="role" value="Company" />
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fab fa-facebook"></i> Facebook
+                    </button>
+                </form>
+                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                    <input type="hidden" name="provider" value="Microsoft" />
+                    <input type="hidden" name="role" value="Company" />
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <i class="fab fa-microsoft"></i> Microsoft
+                    </button>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>
-
-
-@* @model Jobportalwebsite.Viewmodel.RegistrationViewModel
-@{
-    Layout = "~/Views/Shared/_AccountLayout.cshtml";
-}
-<div class="d-flex justify-content-center" style="min-height: 100vh; margin-top: 20px;">
-    <div class="card" style="width: 36rem;">
-        <div class="card-body">
-            <h2 class="card-title text-center">Company Registration</h2>
-
-            <form asp-action="Register" method="post">
-                <input type="hidden" asp-for="Role" value="Company" />
-
-                <div class="mb-3">
-                        <label for="Email" class="form-label">Email</label>
-                        <input type="email" asp-for="Email" class="form-control" placeholder="Enter your email" required />
-                    </div>
-
-
-                <div class="mb-3">
-                        <label for="Password" class="form-label">Password</label>
-                        <input type="password" asp-for="Password" class="form-control" placeholder="Enter your password" required />
-                    </div>
-
-
-                <div class="mb-3">
-                        <label for="ConfirmPassword" class="form-label">Confirm Password</label>
-                        <input type="password" asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" required />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                    </div>
-
-                   
-             
-
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Register</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div> *@
-
 

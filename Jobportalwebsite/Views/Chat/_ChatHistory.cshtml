@@ -1,0 +1,171 @@
+﻿
+
+@model List<Jobportalwebsite.ViewModel.ChatMessageViewModel>
+@{
+    var receiver = Model.FirstOrDefault(m => !m.IsCurrentUser);
+    var receiverName = receiver?.SenderUserName ?? "User";
+    var receiverPicture = receiver?.ProfilePicturePath ?? "/images/anonymous.png";
+    var isOnline = receiver?.IsOnline ?? false;
+    var lastSeen = receiver?.LastSeen?.ToString("dd MMM yyyy, hh:mm tt") ?? "Unknown";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<div class="chat-header d-flex align-items-center justify-content-between p-2 shadow-sm bg-white sticky-top">
+    <div class="d-flex align-items-center">
+        <a href="javascript:history.back()" class="me-2 text-dark">
+            <i class="bi bi-arrow-left fs-4"></i>
+        </a>
+        <img src="@receiverPicture" class="rounded-circle me-2" width="40" height="40" />
+        <div>
+            <div class="fw-bold" id="chat-username">@receiverName</div>
+            <small class="text-muted d-flex align-items-center gap-1" id="chat-status">
+                <span id="status-dot" class="status-dot @(isOnline ? "bg-success" : "bg-secondary")"></span>
+                <span id="status-text">@(isOnline ? "Online" : $"Last seen: {lastSeen}")</span>
+            </small>
+        </div>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <a href="#" class="text-dark"><i class="bi bi-camera-video fs-5"></i></a>
+        <a href="#" class="text-dark"><i class="bi bi-telephone fs-5"></i></a>
+        <a href="#" class="text-dark"><i class="bi bi-three-dots-vertical fs-5"></i></a>
+    </div>
+</div>
+
+<div class="chat-body p-3">
+    @{
+        DateTime? currentDate = null;
+    }
+    @foreach (var msg in Model)
+    {
+        var newDate = msg.Timestamp.Date;
+        if (currentDate != newDate)
+        {
+            currentDate = newDate;
+            <div class="chat-date">@msg.Timestamp.ToString("dd MMMM yyyy")</div>
+        }
+
+        <div class="d-flex @(msg.IsCurrentUser ? "justify-content-end" : "justify-content-start") mb-1">
+            <div class="message-bubble @(msg.IsCurrentUser ? "sent" : "received")">
+                <div>@msg.Message</div>
+                <small class="timestamp">@msg.Timestamp.ToString("HH:mm")</small>
+            </div>
+        </div>
+    }
+</div>
+
+@Html.Raw("<script src=\"https://cdn.jsdelivr.net/npm/@microsoft/signalr@latest/dist/browser/signalr.min.js\"></script>")
+
+<style>
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    body {
+        background-color: #eaeaea;
+    }
+
+    .chat-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .chat-body {
+        height: 80vh;
+        overflow-y: auto;
+        background: url('/images/chat-background.jpg') no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .message-bubble {
+        max-width: 70%;
+        padding: 10px 14px;
+        border-radius: 15px;
+        position: relative;
+        word-wrap: break-word;
+        font-size: 0.95rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .sent {
+        background-color: #005c4b;
+        color: white;
+        border-radius: 15px 15px 0 15px;
+    }
+
+    .received {
+        background-color: #ffffff;
+        color: #000;
+        border-radius: 15px 15px 15px 0;
+    }
+
+
+    .timestamp {
+        font-size: 0.7rem;
+        display: block;
+        text-align: right;
+        margin-top: 5px;
+        opacity: 0.6;
+    }
+
+    .chat-date {
+        text-align: center;
+        background-color: rgba(0,0,0,0.3);
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        margin: 10px auto;
+        width: fit-content;
+    }
+</style>
+<script>
+    const receiverUsername = "@receiverName";
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chatHub")
+        .withAutomaticReconnect()
+        .build();
+
+    connection.on("UserStatusChanged", function (username, isOnline, lastSeen) {
+        if (username === receiverUsername) {
+            const dot = document.getElementById("status-dot");
+            const text = document.getElementById("status-text");
+
+            if (isOnline) {
+                dot.classList.remove("bg-secondary");
+                dot.classList.add("bg-success");
+                text.innerText = "Online";
+            } else {
+                dot.classList.remove("bg-success");
+                dot.classList.add("bg-secondary");
+                text.innerText = "Last seen: " + formatDate(lastSeen);
+            }
+        }
+    });
+      
+
+    connection.start()
+        .then(() => console.log("Connected to /chatHub"))
+        .catch(err => console.error(err.toString()));
+
+    function formatDate(isoString) {
+        const date = new Date(isoString);
+        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+        return date.toLocaleString(undefined, options);
+    }
+    
+    const chatBody = document.querySelector('.chat-body');
+    function scrollToBottom() {
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    
+    scrollToBottom();
+
+
+</script>

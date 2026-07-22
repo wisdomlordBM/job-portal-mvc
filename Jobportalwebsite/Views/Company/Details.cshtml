@@ -1,34 +1,86 @@
 ﻿@model Jobportalwebsite.Models.Company
-
-@* @{
-    Layout = "~/Views/Shared/_Company.cshtml";
-} *@
 @{
     bool isCompanyOwner = ViewBag.IsCompanyOwner ?? false;
     Layout = isCompanyOwner ? "~/Views/Shared/_Company.cshtml" : "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-5">
-    <div class="card shadow-lg rounded-4" style="max-width: 600px; margin: auto;">
-        <div class="card-body text-center">
-            <!-- Profile Picture -->
-            <div class="mb-3">
-                <img src="@Model.ProfilePicturePath" alt="Company Profile Picture" class="rounded-circle img-fluid" style="width: 150px; height: 150px;">
-            </div>
-            <!-- Company Details -->
-            <h3 class="card-title">@Model.Name</h3>
-            <p ><strong>Industry:</strong>@Model.Industry</p>
-            <p> <strong>Description:</strong>@Model.Description</p>
-            <p><strong>Location:</strong> @Model.Location</p>
-            <p><strong>Website:</strong> <a href="@Model.WebsiteUrl" target="_blank">@Model.WebsiteUrl</a></p>
+<style>
+    .company-hero {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #eef1f4;
+        margin-bottom: 70px;
+    }
 
-            <!-- Back Button -->
-            <a href="javascript:history.back()" class="btn btn-outline-secondary mt-3">
-                <i class="bi bi-arrow-left-circle"></i> Back
-            </a>
+        .company-hero .banner {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .company-hero .logo-wrap {
+            position: absolute;
+            left: 50%;
+            bottom: -50px;
+            transform: translateX(-50%);
+        }
+
+            .company-hero .logo-wrap img {
+                width: 110px;
+                height: 110px;
+                object-fit: cover;
+                border-radius: 50%;
+                border: 4px solid #fff;
+                background: #fff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            }
+</style>
+
+<div class="container mt-5" style="max-width: 700px;">
+    <div class="company-hero">
+        <img class="banner"
+             src="@(string.IsNullOrEmpty(Model.CoverBannerPath) ? "/images/default-cover-banner.png" : Model.CoverBannerPath)"
+             alt="Cover Banner" />
+        <div class="logo-wrap">
+            <img src="@(string.IsNullOrEmpty(Model.ProfilePicturePath) ? "/images/default-company-logo.png" : Model.ProfilePicturePath)"
+                 alt="Company Logo" />
         </div>
     </div>
+
+    <div class="card shadow-sm rounded-4 p-4 text-center">
+        <h3 class="mb-1">@Model.Name</h3>
+        <p class="text-muted mb-3">@Model.Industry</p>
+        <p>@Model.Description</p>
+
+        <div class="row text-start mt-3">
+            <div class="col-md-6 mb-2">
+                <strong>Location:</strong>
+                @(string.IsNullOrWhiteSpace($"{Model.City}{Model.State}") ? "Not specified" : $"{Model.City}, {Model.State}")
+                @if (Model.Country != null)
+                {
+                    <span>, @Model.Country.Name</span>
+                }
+            </div>
+            <div class="col-md-6 mb-2">
+                <strong>Phone:</strong> @(Model.Phone ?? "Not specified")
+            </div>
+            <div class="col-md-12 mb-2">
+                <strong>Website:</strong>
+                @if (!string.IsNullOrEmpty(Model.WebsiteUrl))
+                {
+                    <a href="@Model.WebsiteUrl" target="_blank">@Model.WebsiteUrl</a>
+                }
+                else
+                {
+                    <span>Not specified</span>
+                }
+            </div>
+        </div>
+
+        <a href="javascript:history.back()" class="btn btn-outline-secondary mt-3">
+            <i class="bi bi-arrow-left-circle"></i> Back
+        </a>
+    </div>
 </div>
-
-
-

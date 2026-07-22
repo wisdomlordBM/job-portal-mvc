@@ -1,0 +1,26 @@
+﻿@model Jobportalwebsite.Models.CompanyOnboardingStep
+
+<div class="d-flex justify-content-between mb-4">
+    @{
+        var steps = new (string Label, Jobportalwebsite.Models.CompanyOnboardingStep Step)[]
+        {
+    ("Create Account", Jobportalwebsite.Models.CompanyOnboardingStep.Details),
+    ("Company Details", Jobportalwebsite.Models.CompanyOnboardingStep.Details),
+    ("Branding", Jobportalwebsite.Models.CompanyOnboardingStep.Branding),
+    ("Office Info", Jobportalwebsite.Models.CompanyOnboardingStep.OfficeInfo)
+        };
+    }
+    @for (int i = 0; i < steps.Length; i++)
+    {
+        var isActive = (int)Model == (int)steps[i].Step;
+        var isDone = (int)Model > (int)steps[i].Step;
+        <div class="text-center flex-fill">
+            <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center
+                        @(isDone ? "bg-success text-white" : isActive ? "bg-primary text-white" : "bg-light text-muted")"
+                 style="width:36px;height:36px;">
+                @(isDone ? "✔" : (i + 1).ToString())
+            </div>
+            <small class="d-block mt-1">@steps[i].Label</small>
+        </div>
+    }
+</div>

@@ -127,11 +127,17 @@ namespace Jobportalwebsite.Migrations
                     b.Property<string>("JobTitle")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PerformanceBadge")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SchoolName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TestScore")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -163,6 +169,9 @@ namespace Jobportalwebsite.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("CountryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -182,8 +191,14 @@ namespace Jobportalwebsite.Migrations
                     b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastSeen")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -228,6 +243,8 @@ namespace Jobportalwebsite.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -275,6 +292,37 @@ namespace Jobportalwebsite.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("Blogs");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReceiverUserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderUserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChatMessages");
                 });
 
             modelBuilder.Entity("Jobportalwebsite.Models.Comment", b =>
@@ -345,6 +393,18 @@ namespace Jobportalwebsite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CountryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CoverBannerPath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -363,7 +423,19 @@ namespace Jobportalwebsite.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OnboardingStep")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ProfilePicturePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WebsiteUrl")
@@ -371,9 +443,72 @@ namespace Jobportalwebsite.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CountryId");
+
                     b.HasIndex("EmployerId");
 
                     b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Iso3Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IsoCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.HasIndex("IsoCode")
+                        .IsUnique();
+
+                    b.ToTable("Countries");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.Currency", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Currencies");
                 });
 
             modelBuilder.Entity("Jobportalwebsite.Models.Job", b =>
@@ -414,14 +549,79 @@ namespace Jobportalwebsite.Migrations
                     b.Property<string>("RequiredSkills")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Salary")
+                    b.Property<decimal?>("Salary")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SalaryPeriod")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
 
                     b.ToTable("Jobs");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.JobSeekerAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ApplicationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JobSkillTestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SelectedAnswer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationId");
+
+                    b.HasIndex("JobSkillTestId");
+
+                    b.ToTable("JobSeekerAnswers");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.JobSkillTest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CorrectAnswer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("JobId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OptionA")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OptionB")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OptionC")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OptionD")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Question")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobId");
+
+                    b.ToTable("JobSkillTests");
                 });
 
             modelBuilder.Entity("Jobportalwebsite.Models.Jobseekers", b =>
@@ -455,6 +655,34 @@ namespace Jobportalwebsite.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Jobseekers");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.Message", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageId"));
+
+                    b.Property<string>("MessageText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MessageId");
+
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Jobportalwebsite.Models.Reply", b =>
@@ -760,6 +988,16 @@ namespace Jobportalwebsite.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Jobportalwebsite.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("Jobportalwebsite.Models.Country", "CountryReference")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CountryReference");
+                });
+
             modelBuilder.Entity("Jobportalwebsite.Models.Blog", b =>
                 {
                     b.HasOne("Jobportalwebsite.Models.Company", "Company")
@@ -800,11 +1038,29 @@ namespace Jobportalwebsite.Migrations
 
             modelBuilder.Entity("Jobportalwebsite.Models.Company", b =>
                 {
+                    b.HasOne("Jobportalwebsite.Models.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Jobportalwebsite.Models.User", "Employer")
                         .WithMany()
                         .HasForeignKey("EmployerId");
 
+                    b.Navigation("Country");
+
                     b.Navigation("Employer");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.Country", b =>
+                {
+                    b.HasOne("Jobportalwebsite.Models.Currency", "Currency")
+                        .WithMany()
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("Jobportalwebsite.Models.Job", b =>
@@ -814,6 +1070,36 @@ namespace Jobportalwebsite.Migrations
                         .HasForeignKey("CompanyId");
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.JobSeekerAnswer", b =>
+                {
+                    b.HasOne("Jobportalwebsite.Models.Application", "Application")
+                        .WithMany("JobSeekerAnswers")
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Jobportalwebsite.Models.JobSkillTest", "JobSkillTest")
+                        .WithMany("JobSeekerAnswers")
+                        .HasForeignKey("JobSkillTestId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Application");
+
+                    b.Navigation("JobSkillTest");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.JobSkillTest", b =>
+                {
+                    b.HasOne("Jobportalwebsite.Models.Job", "Job")
+                        .WithMany("SkillTests")
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Job");
                 });
 
             modelBuilder.Entity("Jobportalwebsite.Models.Jobseekers", b =>
@@ -917,6 +1203,11 @@ namespace Jobportalwebsite.Migrations
                     b.Navigation("Notifications");
                 });
 
+            modelBuilder.Entity("Jobportalwebsite.Models.Application", b =>
+                {
+                    b.Navigation("JobSeekerAnswers");
+                });
+
             modelBuilder.Entity("Jobportalwebsite.Models.Blog", b =>
                 {
                     b.Navigation("Comments");
@@ -925,6 +1216,16 @@ namespace Jobportalwebsite.Migrations
             modelBuilder.Entity("Jobportalwebsite.Models.Comment", b =>
                 {
                     b.Navigation("Replies");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.Job", b =>
+                {
+                    b.Navigation("SkillTests");
+                });
+
+            modelBuilder.Entity("Jobportalwebsite.Models.JobSkillTest", b =>
+                {
+                    b.Navigation("JobSeekerAnswers");
                 });
 #pragma warning restore 612, 618
         }

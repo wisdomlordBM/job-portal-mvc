@@ -42,81 +42,7 @@ namespace Jobportalwebsite.Controllers
         }
 
 
-        //public async Task<IActionResult> Details(int id)
-        //{
-        //    var blog = await _context.Blogs
-        //        .Include(b => b.Comments.OrderByDescending(c => c.DateCommented)) // Sort Comments
-        //        .ThenInclude(c => c.Replies.OrderByDescending(r => r.DateReplied)) // Sort Replies
-        //        .FirstOrDefaultAsync(b => b.Id == id && !b.Deleted);
-
-        //    if (blog == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    Sort comments by date(latest first)
-        //    blog.Comments = blog.Comments
-        //        .OrderByDescending(c => c.DateCommented)
-        //        .ToList();
-
-        //    Fetch profile pictures and roles dynamically for all comments and replies
-        //    foreach (var comment in blog.Comments)
-        //        {
-        //            if (!comment.IsAnonymous)
-        //            {
-        //                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == comment.CommentedBy);
-        //                var company = await _context.Companies.FirstOrDefaultAsync(c => c.Email == comment.CommentedBy);
-
-        //                comment.ProfilePicturePath = company?.ProfilePicturePath ?? user?.ProfilePicturePath ?? "/images/default-profile.png";
-
-        //                Determine the role
-        //                if (company != null)
-        //                {
-        //                    user.Role = "Company";
-        //                }
-        //                else if (user != null)
-        //                {
-        //                    user.Role = "Jobseeker";
-        //                }
-        //                else
-        //                {
-        //                    user.Role = "Unknown";
-        //                }
-        //            }
-
-        //            Fetch profile pictures and roles for replies
-        //           if (comment.Replies != null)
-        //                {
-        //                    foreach (var reply in comment.Replies)
-        //                    {
-        //                        if (!reply.IsAnonymous)
-        //                        {
-        //                            var replyUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == reply.RepliedBy);
-        //                            var replyCompany = await _context.Companies.FirstOrDefaultAsync(c => c.Email == reply.RepliedBy);
-
-        //                            reply.ProfilePicturePath = replyCompany?.ProfilePicturePath ?? replyUser?.ProfilePicturePath ?? "/images/default-profile.png";
-
-        //                            Determine the role
-        //                            if (replyCompany != null)
-        //                            {
-        //                                reply.User.Role = "Company";
-        //                            }
-        //                            else if (replyUser != null)
-        //                            {
-        //                                reply.User.Role = "Jobseeker";
-        //                            }
-        //                            else
-        //                            {
-        //                                reply.User.Role = "Unknown";
-        //                            }
-        //                        }
-        //                    }
-        //                }
-        //        }
-
-        //    return View(blog);
-        //}
-
+       
         public async Task<IActionResult> Detailsh(int id)
         {
             var blog = await _context.Blogs
@@ -231,13 +157,6 @@ namespace Jobportalwebsite.Controllers
 
             return View(blog);
         }
-
-
-
-
-
-
-
         private async Task<string> GetProfilePicturePathAsync(string username, bool isAnonymous)
         {
             if (isAnonymous)
@@ -259,8 +178,6 @@ namespace Jobportalwebsite.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
             return user?.ProfilePicturePath ?? "/images/default-profile.png";
         }
-
-
 
         [Authorize(Roles = "Company")]
         public IActionResult Create()
@@ -316,11 +233,6 @@ namespace Jobportalwebsite.Controllers
 
             return View(blog);
         }
-
-
-
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddComment(int blogId, string commentText, bool isAnonymous, int? parentCommentId = null)
@@ -399,18 +311,11 @@ namespace Jobportalwebsite.Controllers
 
             return RedirectToAction(nameof(Details), new { id = comment.BlogId });
         }
-
-
-
         private async Task<string> GetUserProfilePicture(string username)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
             return user?.ProfilePicturePath ?? "/images/default-profile.png";
-
-
         }
-
-
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -437,9 +342,6 @@ namespace Jobportalwebsite.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -462,8 +364,5 @@ namespace Jobportalwebsite.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-      
-
     }
 }

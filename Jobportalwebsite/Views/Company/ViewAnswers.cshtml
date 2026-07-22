@@ -1,0 +1,56 @@
+﻿@model IEnumerable<Jobportalwebsite.Models.AnswerViewModel>
+
+@{
+    ViewData["Title"] = "Jobseeker Test Answers";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (!Model.Any())
+{
+    <p>No test answers were found for this application.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Your Answer</th>
+                <th>Correct Answer</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var answer in Model)
+            {
+                <tr>
+                    <td>@answer.QuestionText</td>
+                    <td>
+                        @if (string.IsNullOrEmpty(answer.UserSelectedAnswer))
+                        {
+                            @:Not Answered
+                        }
+                        else
+                        {
+                            @answer.UserSelectedAnswer
+                        }
+                    </td>
+                    <td>@answer.CorrectAnswer</td>
+                    <td>
+                        @if (answer.IsCorrect)
+                        {
+                            <span class="badge bg-success">Correct</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Incorrect</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+

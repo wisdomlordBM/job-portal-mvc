@@ -35,6 +35,15 @@
                                     <li class="nav-item">
                                         <a class="nav-link " asp-area="" asp-controller="Job" asp-action="Index">Jobs</a>
                                     </li>
+                                    <li class="nav-item">
+
+                                        <!-- Add to the navbar or wherever you want the chat icon -->
+                                        <a href="@Url.Action("Index", "Chat")" class="btn btn-primary">
+                                            <i class="bi bi-chat"></i> Chat
+                                        </a>
+                                     </li>
+                     
+
                                 </ul>
                                 <ul class="navbar-nav ms-auto">
                                 
@@ -97,22 +106,11 @@
                                             <i class="fas fa-bell" style="font-size: 1.5rem;"></i>
                                             <span id="notificationCount" class="badge bg-danger" style="position: absolute; top: 0; right: 0; display: none;">0</span>
                                         </a>
-
-
                                     }
                                 </li>
                             </ul>
 
-
-
-                                           
-
-                                      
-                                    
-
                     </nav>
-
-       
 
     </header>
 
@@ -121,7 +119,6 @@
             @RenderBody()
         </main>
     </div>
-
     <footer class= footer text-muted bg-dark">
     
         <footer class="bg-dark text-white py-2">
@@ -175,9 +172,7 @@
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <form method="post" asp-controller="Company" asp-action="MarkAllAsRead">
-                        <button type="submit" class="btn btn-primary">Mark All as Read</button>
-                    </form>
+                    <button type="button" id="markAllReadBtn" class="btn btn-primary">Mark All as Read</button>
                 </div>
             </div>
         </div>
@@ -194,32 +189,41 @@
 
     <script>
         $(document).ready(function () {
-            $.get('/Company/GetUserNotifications', function (notifications) {
-                console.log(notifications);   
-                let notificationList = $('#notificationList');
-                notificationList.empty();
+                  $.get('/Notification/GetMyNotifications', function (notifications) {
+            let notificationList = $('#notificationList');
+            notificationList.empty();
 
-                notifications.forEach(function (notification) {
-                    notificationList.append('<li class="list-group-item">' + notification.message + '</li>');
-                });
-
-                let notificationCount = notifications.length;
-                $('#notificationCount').text(notificationCount); 
-
-                if (notificationCount > 0) {
-                    $('#notificationCount').show();  
-                } else {
-                    $('#notificationCount').hide(); /
-                }
+            notifications.forEach(function (notification) {
+                notificationList.append('<li class="list-group-item">' + notification.message + '</li>');
             });
 
-            $.get('/Company/GetUserNotificationCount', function (count) {
-                $('#notificationCount').text(count);
-                if (count > 0) {
-                    $('#notificationCount').show();
-                } else {
-                    $('#notificationCount').hide();
-                }
+            let notificationCount = notifications.length;
+            $('#notificationCount').text(notificationCount);
+
+            if (notificationCount > 0) {
+                $('#notificationCount').show();
+            } else {
+                $('#notificationCount').hide();
+            }
+        });
+
+        $.get('/Notification/GetMyNotificationCount', function (count) {
+            $('#notificationCount').text(count);
+            if (count > 0) {
+                $('#notificationCount').show();
+            } else {
+                $('#notificationCount').hide();
+            }
+        });
+        });
+                $('#markAllReadBtn').on('click', function () {
+            $.post('/Notification/MarkAllMyNotificationsAsRead', function () {
+                $('#notificationList').empty().append('<li class="list-group-item text-muted">No new notifications.</li>');
+                $('#notificationCount').text(0).hide();
+
+                setTimeout(function () {
+                    $('#notificationsModal').modal('hide');
+                }, 800);
             });
         });
     </script>

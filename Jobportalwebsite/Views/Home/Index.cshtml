@@ -203,7 +203,7 @@
                                             </p>
                                             <p><strong>Location:</strong> <span class="job-location">@job.Location</span></p>
                                             <p><strong>Employment Type:</strong> <span class="job-employment">@job.EmploymentType</span></p>
-                                            <p><strong>Salary:</strong> @job.Salary.ToString("C2", new System.Globalization.CultureInfo("ig-NG"))</p>
+                                            <p><strong>Salary:</strong> @Jobportalwebsite.Helper.SalaryFormatter.Format(job.Salary, job.Company?.Country?.Currency?.Symbol, job.SalaryPeriod)</p>
                                             <p><strong>Date Posted:</strong> <span class="job-date">@job.DatePosted.ToString("MMMM dd, yyyy")</span></p>
                                             <div class="d-flex justify-content-center">
                                                 <a asp-controller="Jobseekers" asp-action="Create" asp-route-jobId="@job.Id" class="btn btn-outline-success">Apply</a>
@@ -304,6 +304,7 @@
     
     <a class="btn btn-primary btn-lg" asp-area="" asp-controller="Account" asp-action="Register">Sign Up for Alerts</a>
 </div>
+
 
 
 <style>

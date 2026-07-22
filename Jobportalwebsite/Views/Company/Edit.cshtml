@@ -2,75 +2,117 @@
 @{
     Layout = "~/Views/Shared/_Company.cshtml";
 }
-<div>
-    <h2>Edit Company Profile</h2>
-    <form asp-action="Edit" asp-route-id="@Model.Id" enctype="multipart/form-data">
-        <div class="form-group">
-            <label>Company Name</label>
-            <input type="text" asp-for="Name" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Description</label>
-            <textarea asp-for="Description" class="form-control"></textarea>
-        </div>
-        <div class="form-group">
-            <label>Location</label>
-            <input type="text" asp-for="Location" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Industry</label>
-            <input type="text" asp-for="Industry" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Website URL</label>
-            <input type="text" asp-for="WebsiteUrl" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Profile Picture</label>
-            <input type="file" name="profilePicture" class="form-control" />
-        </div>
 
-        <button type="submit" class="btn btn-outline-success">Save Changes</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-    </form>
+<div class="container mt-4" style="max-width: 700px;">
+    <div class="card shadow-sm rounded-4 p-4">
+        <h2 class="mb-4">Edit Company Profile</h2>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Company Name</label>
+                <input asp-for="Name" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Industry</label>
+                    <input asp-for="Industry" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Phone</label>
+                    <input asp-for="Phone" class="form-control" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Website URL</label>
+                <input asp-for="WebsiteUrl" type="url" class="form-control" />
+            </div>
+
+            <hr class="my-4" />
+            <h5 class="mb-3">Office Information</h5>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Address</label>
+                <input asp-for="Address" class="form-control" />
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">City</label>
+                    <input asp-for="City" class="form-control" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">State</label>
+                    <input asp-for="State" class="form-control" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Postal Code</label>
+                    <input asp-for="PostalCode" class="form-control" />
+                </div>
+            </div>
+
+            <hr class="my-4" />
+            <h5 class="mb-3">Branding</h5>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Company Logo</label>
+                @if (!string.IsNullOrEmpty(Model.ProfilePicturePath))
+                {
+                    <img src="@Model.ProfilePicturePath" style="width:90px;height:90px;object-fit:cover;border-radius:50%;" class="d-block mb-2" />
+                }
+                <input type="file" name="profilePicture" id="profilePicture" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                <img id="logoPreview" src="#" style="display:none;width:90px;height:90px;object-fit:cover;border-radius:50%;margin-top:10px;" />
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Cover Banner</label>
+                @if (!string.IsNullOrEmpty(Model.CoverBannerPath))
+                {
+                    <img src="@Model.CoverBannerPath" style="max-width:100%;height:120px;object-fit:cover;border-radius:8px;" class="d-block mb-2" />
+                }
+                <input type="file" name="coverBannerFile" id="coverBannerFile" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                <img id="bannerPreview" src="#" style="display:none;max-width:100%;height:120px;object-fit:cover;border-radius:8px;margin-top:10px;" />
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Save Changes</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
 
-
-@* @model Jobportalwebsite.Models.Company
-@{
-    Layout = "~/Views/Shared/_Company.cshtml";
-}
-<div >
-    <h2>Edit Company Profile</h2>
-    <form asp-action="Edit" asp-route-id="@Model.Id">
-        <div class="form-group">
-            <label>Company Name</label>
-            <input type="text" asp-for="Name" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Description</label>
-            <textarea asp-for="Description" class="form-control"></textarea>
-        </div>
-        <div class="form-group">
-            <label>Location</label>
-            <input type="text" asp-for="Location" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Industry</label>
-            <input type="text" asp-for="Industry" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Website URL</label>
-            <input type="text" asp-for="WebsiteUrl" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label>Profile Picture</label>
-            <input type="file" asp-for="ProfilePicturePath" class="form-control" />
-        </div>
-
-
-        <button type="submit" class="btn btn-outline-success">Save Changes</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-    </form>
-</div> *@
-
+<script>
+    function wirePreview(inputId, previewId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        input.addEventListener("change", function () {
+            if (this.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = e => { preview.src = e.target.result; preview.style.display = "block"; };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+    wirePreview("profilePicture", "logoPreview");
+    wirePreview("coverBannerFile", "bannerPreview");
+</script>

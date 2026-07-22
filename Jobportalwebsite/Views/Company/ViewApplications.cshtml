@@ -3,13 +3,13 @@
 @{
     Layout = "~/Views/Shared/_Company.cshtml";
 }
+
 @if (TempData["Message"] != null)
 {
     <div class="alert alert-info">
         @TempData["Message"]
     </div>
 }
-
 
 <h2 class="mb-4">Applications</h2>
 <div class="row">
@@ -20,6 +20,41 @@
                 <img src="~/@application.ImageUrl" alt="Job Image" class="card-img-top" style="height: 150px; object-fit: cover;">
                 <div class="card-body">
                     <h5 class="card-title">@application.JobTitle</h5>
+
+
+                    <div class="text-center mb-3">
+                        <a href="@Url.Action("Details", "Jobseekers", new { email = application.Email })">
+                            <img src="@Url.Content(application.ProfilePicturePath ?? "/uploads/default-profile.png")"
+                                 onerror="this.onerror=null; this.src='/uploads/default-profile.png';"
+                                 alt="Profile Picture"
+                                 class="rounded-circle"
+                                 style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #ddd;">
+                        </a>
+                    </div>
+
+
+
+
+
+                    <!-- Badge for Test Performance -->
+                    @if (application.TestScore.HasValue && !string.IsNullOrEmpty(application.PerformanceBadge))
+                    {
+                        <div class="mb-2">
+                            <span class="badge @(application.PerformanceBadge == "Success" ? "bg-success" :
+                                                  application.PerformanceBadge == "Medium" ? "bg-warning" :
+                                                  "bg-danger")">
+                                @application.PerformanceBadge
+                            </span>
+                            <span class="text-muted">(@application.TestScore.Value%)</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mb-2">
+                            <span class="badge bg-secondary">No Test Taken</span>
+                        </div>
+                    }
+
                     <p class="card-text">
                         <strong>Applicant:</strong> @application.FirstName @application.LastName <br />
                         <strong>Email:</strong> @application.Email <br />
@@ -29,9 +64,10 @@
                         <strong>Education Level:</strong> @application.EducationLevel <br />
                         <strong>City:</strong> @application.City <br />
                         <strong>Description:</strong> @application.Description <br />
-                        <strong>Salary:</strong> @application.Salary <br />
+                        <strong>Salary:</strong> @Jobportalwebsite.Helper.SalaryFormatter.Format(application.Salary, application.CurrencySymbol, application.SalaryPeriod) <br />
                         <strong>Applied On:</strong> @application.DateApplied.ToString("g")
                     </p>
+
                     @if (!string.IsNullOrEmpty(application.CVPath))
                     {
                         <a href="@Url.Content(application.CVPath)" target="_blank" class="btn btn-primary mb-2">View CV</a>
@@ -42,23 +78,25 @@
                     }
 
                     <div class="d-flex justify-content-between">
-                       
                         <form asp-controller="Company" asp-action="Check" method="post">
                             <input type="hidden" name="applicationId" value="@application.Id" />
                             <button type="submit" class="btn btn-warning btn-sm">Check</button>
                         </form>
 
-                       
                         <form asp-controller="Company" asp-action="Accept" method="post">
                             <input type="hidden" name="applicationId" value="@application.Id" />
                             <button type="submit" class="btn btn-success btn-sm">Accept</button>
                         </form>
 
-                       
                         <form asp-controller="Company" asp-action="Decline" method="post">
                             <input type="hidden" name="applicationId" value="@application.Id" />
                             <button type="submit" class="btn btn-danger btn-sm">Decline</button>
                         </form>
+
+                        <a href="@Url.Action("ViewAnswers", "Company", new { applicationId = application.Id })" class="btn btn-info btn-sm">
+                            View Answers
+                        </a>
+
                     </div>
 
                 </div>
@@ -66,11 +104,4 @@
         </div>
     }
 </div>
-
-
-
-
-
-
-
 

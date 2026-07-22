@@ -1,93 +1,101 @@
 ﻿@model IEnumerable<Jobportalwebsite.Models.ApplicationUser>
-
-@if (Model != null && Model.Any())
-{
-    <div class="row">
-        @foreach (var applicationUser in Model)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm h-100" style="border-radius: 15px;">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="@Url.Content(applicationUser.ProfilePicturePath)"
-                                 alt="Profile Picture" class="img-thumbnail"
-                                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 10px;" />
-                            <h5 class="mb-0">
-                                <strong>Name:</strong> @applicationUser.FirstName @applicationUser.LastName
-                            </h5>
-                        </div>
-                        <p><strong>Email:</strong> @applicationUser.Email</p>
-                        <p><strong>Location:</strong> @applicationUser.Address</p>
-                        <p><strong>Contact:</strong> @applicationUser.PhoneNumber</p>
-                        <p><strong>Gender:</strong> @applicationUser.Gender</p>
-                        <p><strong>Country:</strong> <span class="text-truncate">@applicationUser.Country</span></p>
-
-                        <div class="d-flex justify-content-end">
-                            <a href="@Url.Action("Details", "Jobseekers", new { email = applicationUser.Email })"
-                               class="btn btn-info btn-sm me-2">Details</a>
-                            <a href="@Url.Action("Edit", "Jobseekers", new { id = applicationUser.Id })"
-                               class="btn btn-warning btn-sm me-2">Edit</a>
-                            <form asp-action="Delete" asp-route-id="@applicationUser.Id" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this jobseeker?');">Delete</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-}
-else
-{
-    <p class="text-center">No jobseekers found.</p>
-}
-
-
-@* @model IEnumerable<Jobportalwebsite.Models.ApplicationUser>
-
 @{
     Layout = "~/Views/Shared/_Jobseekers.cshtml";
 }
 
-<h2 class="mb-4 text-center">Manage Jobseekers</h2>
+<style>
+    .profile-hero {
+        background: linear-gradient(135deg, #12bcaa, #0d8f80);
+        border-radius: 16px;
+        padding: 40px 30px 60px;
+        color: #fff;
+        text-align: center;
+        position: relative;
+        margin-bottom: 60px;
+    }
 
-@if (Model != null && Model.Any())
-{
-    <div class="row">
-        @foreach (var applicationUser in Model)
+        .profile-hero img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            position: absolute;
+            left: 50%;
+            bottom: -50px;
+            transform: translateX(-50%);
+            background: #fff;
+        }
+
+    .info-card {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .info-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #6c757d;
+    }
+</style>
+
+<div class="container mt-4" style="max-width: 700px;">
+    @if (Model != null && Model.Any())
+    {
+        var me = Model.First();
+
+        if (!me.IsProfileComplete())
         {
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm h-100" style="border-radius: 15px;">
-                    <div class="card-body">
-                        <img src="@applicationUser.ProfilePicturePath" alt="Profile Picture" class="img-thumbnail" style="max-width: 50px; margin-right: 10px; border-radius: 50%; object-fit: cover;" />
-                        <h5 class="card-title">
-                            <strong>Name:</strong> @applicationUser.FirstName @applicationUser.LastName
-                        </h5>
-                        <p><strong>Email:</strong> @applicationUser.Email</p>
-                        <p><strong>Location:</strong> @applicationUser.Address</p>
-                        <p><strong>Contact:</strong> @applicationUser.PhoneNumber</p>
-                        <p><strong>Gender:</strong> @applicationUser.Gender</p>
-                        <p><strong>Country:</strong> <span class="text-truncate">@applicationUser.Country</span></p>
-
-                        <div class="d-flex justify-content-end">
-                            <a class="nav-link btn btn-primary btn-sm me-2" asp-area="" asp-controller="Jobseekers" asp-action="Details" asp-route-id="@applicationUser.Id">Details</a>
-                            <a class="nav-link btn btn-warning btn-sm me-2" asp-area="" asp-controller="Jobseekers" asp-action="Edit" asp-route-id="@applicationUser.Id">Edit</a>
-
-                            <!-- Delete Jobseeker -->
-                            <form asp-action="Delete" asp-route-id="@applicationUser.Id" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this jobseeker?');">Delete</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+            <div class="alert alert-warning d-flex justify-content-between align-items-center mb-4">
+                <span><i class="bi bi-exclamation-circle"></i> Your profile is incomplete. Complete it to improve your chances with employers.</span>
+                <a asp-action="Edit" asp-route-id="@me.Id" class="btn btn-sm btn-warning">Complete Profile</a>
             </div>
         }
-    </div>
-}
-else
-{
-    <p class="text-center">No jobseekers found.</p>
-} *@
 
+        <div class="profile-hero">
+            <h2 class="mb-1">@me.FirstName @me.LastName</h2>
+            <p class="mb-0" style="opacity: 0.9;">@me.Email</p>
+            <img src="@(string.IsNullOrEmpty(me.ProfilePicturePath) ? "/images/anonymous.png" : me.ProfilePicturePath)" alt="Profile Picture" />
+        </div>
 
+        <div class="card info-card p-4 mb-4">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="info-label">Contact</div>
+                    <div>@(me.PhoneNumber ?? "Not set")</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-label">Address</div>
+                    <div>@(me.Address ?? "Not set")</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-label">Country</div>
+                    <div>@(me.Country ?? "Not set")</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-label">Gender</div>
+                    <div>@(me.Gender ?? "Not set")</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-label">Date of Birth</div>
+                    <div>@(me.DateOfBirth ?? "Not set")</div>
+                </div>
+            </div>
+        </div>
 
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <a asp-action="Edit" asp-route-id="@me.Id" class="btn btn-primary">
+                <i class="bi bi-pencil-square"></i> Edit Profile
+            </a>
+            <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-outline-secondary">
+                <i class="bi bi-key"></i> Change Password
+            </a>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">No profile found.</p>
+    }
+</div>

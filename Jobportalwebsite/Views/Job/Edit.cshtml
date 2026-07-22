@@ -31,8 +31,22 @@
         </div>
         <div class="form-group">
             <label asp-for="Salary" class="control-label"></label>
-            <input asp-for="Salary" class="form-control" />
+            <input asp-for="Salary" class="form-control" type="number" step="0.01" />
             <span asp-validation-for="Salary" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SalaryPeriod" class="control-label">Salary Period</label>
+            <select asp-for="SalaryPeriod" class="form-control" id="salaryPeriod" required>
+                <option value="">Select salary period</option>
+                <option value="PerHour">Per Hour</option>
+                <option value="PerDay">Per Day</option>
+                <option value="PerWeek">Per Week</option>
+                <option value="PerMonth">Per Month</option>
+                <option value="PerYear">Per Year</option>
+                <option value="Contract">Contract</option>
+                <option value="Negotiable">Negotiable</option>
+            </select>
+            <span asp-validation-for="SalaryPeriod" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="ImageUrl" class="control-label">Image URL</label>
@@ -43,4 +57,19 @@
         <a asp-action="Index" class="btn btn-secondary">Back to Job Listings</a>
     </form>
 </div>
+
+<script>
+    const salaryPeriod = document.getElementById('salaryPeriod');
+    const salary = document.getElementById('Salary');
+
+    function updateSalaryInput() {
+        const isNegotiable = salaryPeriod.value === 'Negotiable';
+        salary.disabled = isNegotiable;
+        salary.required = !isNegotiable;
+        if (isNegotiable) salary.value = '';
+    }
+
+    salaryPeriod.addEventListener('change', updateSalaryInput);
+    updateSalaryInput();
+</script>
 

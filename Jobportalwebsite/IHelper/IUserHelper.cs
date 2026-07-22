@@ -5,7 +5,7 @@ namespace Jobportalwebsite.IHelper
 {
     public interface IUserHelper
     {
-        Task<ApplicationUser> CreateUserByAsync(RegistrationViewModel applicationUserViewModel);
         Task<ApplicationUser> CreateUserByAsync(RegistrationViewModel model, string role);
+        Task<List<ApplicationUser>> GetAllOtherUsersAsync(string currentUser);
     }
 }

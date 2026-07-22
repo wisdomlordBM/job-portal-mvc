@@ -1,4 +1,8 @@
-﻿@model Jobportalwebsite.Models.Application
+﻿
+@model Jobportalwebsite.Models.Application
+@{
+   
+}
 
 @if (TempData["ErrorMessage"] != null)
 {
@@ -8,30 +12,33 @@
 }
 
 @if (TempData["SuccessMessage"] != null)
-{ 
+{
     <div class="alert alert-success">
         @TempData["SuccessMessage"]
     </div>
 }
 
-<form id="regForm" action="" method="post" enctype="multipart/form-data">
-
+<form asp-action="Create" method="post" enctype="multipart/form-data" id="regForm">
     @Html.AntiForgeryToken()
+    <!-- Hidden field for jobId -->
+    <input type="hidden" name="jobId" value="@ViewBag.Job.Id" />
+
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
                 <div class="card shadow-lg rounded-lg p-4 bg-light">
                     <h2 class="text-center mb-4">Complete Your Application</h2>
 
-                    <!-- Personal Details --> 
+                    <!-- PERSONAL DETAILS SECTION -->
                     <div id="personalDetails">
                         <h5 class="card-title text-center">Personal Details</h5>
                         <hr class="mb-4">
-
                         <div class="form-group mb-3">
                             <label asp-for="Contact" class="form-label">Contact Person PhoneNumber</label>
-                            <input type="text" asp-for="Contact" class="form-control" placeholder="Enter your contact details" required
-                                   id="phoneNumber" />
+                            <!--
+                                IMPORTANT: Ensure Application.Contact is a string to allow proper binding.
+                            -->
+                            <input type="text" asp-for="Contact" class="form-control" placeholder="Enter your contact details" required id="phoneNumber" />
                             <small id="phoneHelp" class="form-text text-muted">
                                 Please enter a valid phone number. Only numeric characters (0-9) are allowed.
                             </small>
@@ -39,401 +46,161 @@
                                 Only numeric values are allowed.
                             </div>
                         </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="Description" class="form-label">Describe Your Personality</label>
                             <textarea asp-for="Description" class="form-control" placeholder="A brief description of yourself" required></textarea>
                         </div>
-
                         <div class="text-center">
-                            <button type="button" class="btn btn-outline-success px-5" id="nextToEducation">Next <i class="bi bi-arrow-right"></i></button>
+                            <button type="button" class="btn btn-outline-success px-5" id="nextToEducation">
+                                Next <i class="bi bi-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Educational History -->
+                    <!-- EDUCATIONAL HISTORY SECTION -->
                     <div id="educationalHistory" style="display:none;">
                         <h5 class="card-title text-center">Educational History</h5>
                         <hr class="mb-4">
-
                         <div class="form-group mb-3">
                             <label asp-for="EducationLevel" class="form-label">Level of Education</label>
                             <input type="text" asp-for="EducationLevel" class="form-control" placeholder="e.g., Bachelor's Degree" required />
                         </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="FieldOfStudy" class="form-label">Field of Study</label>
                             <input type="text" asp-for="FieldOfStudy" class="form-control" placeholder="e.g., Computer Science" required />
                         </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="SchoolName" class="form-label">School Name</label>a
-                            <input type="text" asp-for="SchoolName" class="form-control" placeholder="e.g., Harvard University" required />
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="City" class="form-label">City</label>
-                            <input type="text" asp-for="City" class="form-control" placeholder="Enter your city's name" required />
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="State" class="form-label">State</label>
-                            <input type="text" asp-for="State" class="form-control" placeholder="Enter your state's name" required />
-                        </div>
-
-                        <div class="text-center">
-                            <button type="button" class="btn btn-secondary px-5" id="backToPersonalDetails"><i class="bi bi-arrow-left"></i> Back</button>
-                            <button type="button" class="btn btn-outline-success px-5" id="nextToJobExperience">Next <i class="bi bi-arrow-right"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- Job Experience -->
-                    <div id="jobExperience" style="display:none;">
-                        <h5 class="card-title text-center">Job Experience</h5>
-                        <hr class="mb-4">
-
-                        <div class="form-group mb-3">
-                            <label asp-for="JobTitle" class="form-label">Job Title</label>
-                            <input type="text" asp-for="JobTitle" class="form-control" placeholder="e.g., Software Engineer" required />
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="EmploymentType" class="form-label">Employment Type</label>
-                            <input type="text" asp-for="EmploymentType" class="form-control" placeholder="e.g., Full-Time, Part-Time" required />
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="CompanyName" class="form-label">Company Name</label>
-                            <input type="text" asp-for="CompanyName" class="form-control" placeholder="e.g., TechWave Inc." required />
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="City" class="form-label">Job City</label>
-                            <input type="text" asp-for="City" class="form-control" placeholder="Enter the city of your last job" required />
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="Country" class="form-label">Job Country</label>
-                            <input type="text" asp-for="Country" class="form-control" placeholder="Enter the country of your last job" required />
-                        </div>
-
-                        <!-- CV Upload Section -->
-                        <div class="form-group mb-3">
-                            <label asp-for="CV" class="form-label">Upload Your CV</label>
-                            <input type="file" asp-for="CV" class="form-control" accept=".pdf,.doc,.docx" id="cvUpload" required />
-                            <small id="cvHelp" class="form-text text-muted">Accepted formats: PDF, DOC, DOCX. Max size: 5MB.</small>
-                            <span asp-validation-for="CV" class="text-danger"></span>
-                        </div>
-
-                        <div class="text-center">
-                            <button type="button" class="btn btn-secondary px-5" id="backToEducation"><i class="bi bi-arrow-left"></i> Back</button>
-                            <button type="submit" class="btn btn-outline-success px-5">Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
-<script>
-    // Enforce only numeric input and limit to 11 digits
-    document.getElementById("phoneNumber").addEventListener("input", function (event) {
-        const input = event.target;
-        input.value = input.value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
-
-        if (input.value.length > 11) {
-            input.value = input.value.slice(0, 11); // Limit to 11 digits
-        }
-
-        // Remove error message when input is corrected
-        input.setCustomValidity('');
-        input.classList.remove('is-invalid');
-    });
-
-    // Validate on blur
-    document.getElementById("phoneNumber").addEventListener("blur", function (event) {
-        const input = event.target;
-        if (input.value.length !== 11) {
-            input.setCustomValidity("Phone number must be exactly 11 digits.");
-            input.classList.add('is-invalid'); // Highlight invalid input
-        }
-    });
-
-    // Validate phone number before navigating
-    document.getElementById("nextToEducation").onclick = function () {
-        const phoneNumberInput = document.getElementById("phoneNumber");
-
-        // Validate phone number
-        if (phoneNumberInput.value.length !== 11) {
-            alert("Phone number must be exactly 11 digits.");
-            phoneNumberInput.focus(); // Focus on phone number field for correction
-            return; // Prevent moving to the next section
-        }
-
-        // Validate other form sections
-        if (validateForm("personalDetails")) {
-            document.getElementById("personalDetails").style.display = "none";
-            document.getElementById("educationalHistory").style.display = "block";
-        } else {
-            alert("Please fill all required fields in Personal Details.");
-        }
-    };
-
-    document.getElementById("backToPersonalDetails").onclick = function () {
-        document.getElementById("educationalHistory").style.display = "none";
-        document.getElementById("personalDetails").style.display = "block";
-    };
-
-    document.getElementById("nextToJobExperience").onclick = function () {
-        if (validateForm("educationalHistory")) {
-            document.getElementById("educationalHistory").style.display = "none";
-            document.getElementById("jobExperience").style.display = "block";
-        } else {
-            alert("Please fill all required fields in Educational History.");
-        }
-    };
-
-    document.getElementById("backToEducation").onclick = function () {
-        document.getElementById("jobExperience").style.display = "none";
-        document.getElementById("educationalHistory").style.display = "block";
-    };
-
-    // Validate a form section by checking all required fields
-    function validateForm(sectionId) {
-        let valid = true;
-        const section = document.getElementById(sectionId);
-        const inputs = section.querySelectorAll('[required]');
-
-        inputs.forEach(input => {
-            if (!input.value.trim()) {
-                input.classList.add('is-invalid'); // Highlight invalid inputs
-                valid = false;
-            } else {
-                input.classList.remove('is-invalid'); // Remove highlight if valid
-            }
-        });
-
-        return valid;
-    }
-</script>
-
-@* <script>
-    // Enforce only numeric input and limit to 11 digits
-    document.getElementById("phoneNumber").addEventListener("input", function (event) {
-        const input = event.target;
-        input.value = input.value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
-
-        if (input.value.length > 11) {
-            input.value = input.value.slice(0, 11); // Limit to 11 digits
-        }
-
-        // Remove error message when input is corrected
-        input.setCustomValidity('');
-        input.classList.remove('is-invalid');
-    });
-
-    // Validate on blur
-    document.getElementById("phoneNumber").addEventListener("blur", function (event) {
-        const input = event.target;
-        if (input.value.length !== 11) {
-            input.setCustomValidity("Phone number must be exactly 11 digits.");
-            input.classList.add('is-invalid'); // Highlight invalid input
-        }
-    });
-
-    // Validate a form section by checking all required fields
-    function validateForm(sectionId) {
-        let valid = true;
-        const section = document.getElementById(sectionId);
-        const inputs = section.querySelectorAll('[required]');
-
-        inputs.forEach(input => {
-            if (!input.value.trim()) {
-                input.classList.add('is-invalid'); // Highlight invalid inputs
-                valid = false;
-            } else {
-                input.classList.remove('is-invalid'); // Remove highlight if valid
-            }
-        });
-
-        return valid;
-    }
-
-    // Navigation Buttons Logic
-    document.getElementById("nextToEducation").onclick = function () {
-        if (validateForm("personalDetails")) {
-            document.getElementById("personalDetails").style.display = "none";
-            document.getElementById("educationalHistory").style.display = "block";
-        } else {
-            alert("Please fill all required fields in Personal Details.");
-        }
-    };
-
-    document.getElementById("backToPersonalDetails").onclick = function () {
-        document.getElementById("educationalHistory").style.display = "none";
-        document.getElementById("personalDetails").style.display = "block";
-    };
-
-    document.getElementById("nextToJobExperience").onclick = function () {
-        if (validateForm("educationalHistory")) {
-            document.getElementById("educationalHistory").style.display = "none";
-            document.getElementById("jobExperience").style.display = "block";
-        } else {
-            alert("Please fill all required fields in Educational History.");
-        }
-    };
-
-    document.getElementById("backToEducation").onclick = function () {
-        document.getElementById("jobExperience").style.display = "none";
-        document.getElementById("educationalHistory").style.display = "block";
-    };
-</script> *@
-
-
-
-<script>
-    // Check the current section from ViewBag
-    document.addEventListener("DOMContentLoaded", function () {
-        var currentSection = "@ViewBag.CurrentSection";
-
-        // Hide all sections initially
-        document.getElementById("personalDetails").style.display = "none";
-        document.getElementById("educationalHistory").style.display = "none";
-        document.getElementById("jobExperience").style.display = "none";
-
-        // Show the appropriate section
-        if (currentSection === "jobExperience") {
-            document.getElementById("jobExperience").style.display = "block";
-        } else if (currentSection === "educationalHistory") {
-            document.getElementById("educationalHistory").style.display = "block";
-        } else {
-            document.getElementById("personalDetails").style.display = "block";
-        }
-    });
-</script>
-
-
-@* @model Jobportalwebsite.Models.Application
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
-}
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
-}
-
-<form id="regForm" action="" method="post" enctype="multipart/form-data">
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card shadow-lg rounded-lg p-4 bg-light">
-                    <h2 class="text-center mb-4">Complete Your Application</h2>
-
-                    <!-- Personal Details -->
-                    <div id="personalDetails">
-                        <h5 class="card-title text-center">Personal Details</h5>
-                        <hr class="mb-4">
-
-                        <div class="form-group mb-3">
-                            <label asp-for="Contact" class="form-label">Contact Information</label>
-                            <input type="text" asp-for="Contact" class="form-control" placeholder="Enter your contact details" required />
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="Description" class="form-label">Describe Your Personality</label>
-                            <textarea asp-for="Description" class="form-control" placeholder="A brief description of yourself" required></textarea>
-                        </div>
-
-                        <div class="text-center">
-                            <button type="button" class="btn btn-outline-success px-5" id="nextToEducation">Next <i class="bi bi-arrow-right"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- Educational History -->
-                    <div id="educationalHistory" style="display:none;">
-                        <h5 class="card-title text-center">Educational History</h5>
-                        <hr class="mb-4">
-
-                        <div class="form-group mb-3">
-                            <label asp-for="EducationLevel" class="form-label">Level of Education</label>
-                            <input type="text" asp-for="EducationLevel" class="form-control" placeholder="e.g., Bachelor's Degree" required />
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label asp-for="FieldOfStudy" class="form-label">Field of Study</label>
-                            <input type="text" asp-for="FieldOfStudy" class="form-control" placeholder="e.g., Computer Science" required />
-                        </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="SchoolName" class="form-label">School Name</label>
                             <input type="text" asp-for="SchoolName" class="form-control" placeholder="e.g., Harvard University" required />
                         </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="City" class="form-label">City</label>
                             <input type="text" asp-for="City" class="form-control" placeholder="Enter your city's name" required />
                         </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="State" class="form-label">State</label>
                             <input type="text" asp-for="State" class="form-control" placeholder="Enter your state's name" required />
                         </div>
-
                         <div class="text-center">
-                            <button type="button" class="btn btn-secondary px-5" id="backToPersonalDetails"><i class="bi bi-arrow-left"></i> Back</button>
-                            <button type="button" class="btn btn-outline-success px-5" id="nextToJobExperience">Next <i class="bi bi-arrow-right"></i></button>
+                            <button type="button" class="btn btn-secondary px-5" id="backToPersonalDetails">
+                                <i class="bi bi-arrow-left"></i> Back
+                            </button>
+                            <button type="button" class="btn btn-outline-success px-5" id="nextToJobExperience">
+                                Next <i class="bi bi-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Job Experience -->
+                    <!-- JOB EXPERIENCE SECTION -->
                     <div id="jobExperience" style="display:none;">
                         <h5 class="card-title text-center">Job Experience</h5>
                         <hr class="mb-4">
-
                         <div class="form-group mb-3">
                             <label asp-for="JobTitle" class="form-label">Job Title</label>
                             <input type="text" asp-for="JobTitle" class="form-control" placeholder="e.g., Software Engineer" required />
                         </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="EmploymentType" class="form-label">Employment Type</label>
                             <input type="text" asp-for="EmploymentType" class="form-control" placeholder="e.g., Full-Time, Part-Time" required />
                         </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="CompanyName" class="form-label">Company Name</label>
                             <input type="text" asp-for="CompanyName" class="form-control" placeholder="e.g., TechWave Inc." required />
                         </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="City" class="form-label">Job City</label>
                             <input type="text" asp-for="City" class="form-control" placeholder="Enter the city of your last job" required />
                         </div>
-
                         <div class="form-group mb-3">
                             <label asp-for="Country" class="form-label">Job Country</label>
                             <input type="text" asp-for="Country" class="form-control" placeholder="Enter the country of your last job" required />
                         </div>
-
                         <!-- CV Upload Section -->
                         <div class="form-group mb-3">
-                            <label asp-for="CV" class="form-label">Upload Your CV</label>
-                            <input type="file" asp-for="CV" class="form-control" accept=".pdf,.doc,.docx" id="cvUpload" required />
-                            <small id="cvHelp" class="form-text text-muted">Accepted formats: PDF, DOC, DOCX. Max size: 10MB.</small>
+                            <label for="CV" class="form-label">Upload Your CV</label>
+                            <input type="file" name="CV" class="form-control" accept=".pdf,.doc,.docx" id="cvUpload" required />
+                            <small id="cvHelp" class="form-text text-muted">Accepted formats: PDF, DOC, DOCX. Max size: 5MB.</small>
                             <span asp-validation-for="CV" class="text-danger"></span>
                         </div>
-
                         <div class="text-center">
-                            <button type="button" class="btn btn-secondary px-5" id="backToEducation"><i class="bi bi-arrow-left"></i> Back</button>
-                            <button type="submit" class="btn btn-outline-success px-5">Submit</button>
+                            <button type="button" class="btn btn-secondary px-5" id="backToEducation">
+                                <i class="bi bi-arrow-left"></i> Back
+                            </button>
+                            <button type="button" class="btn btn-outline-success px-5" id="nextToSkillTest">
+                                Next <i class="bi bi-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
+                    @if (ViewBag.SkillTestQuestions != null)
+                    {
+                        <div id="skillTest" style="display:none; position: relative; user-select: none;" oncontextmenu="return false;">
+                            <h5 class="card-title text-center">Skill Test</h5>
+                            <hr class="mb-4" />
+
+                            <!-- Timer display -->
+                            <div class="text-center mb-3">
+                                Time Remaining: <span id="timerDisplay">10</span> seconds
+                            </div>
+
+                            <!-- Question counter display -->
+                            <div class="question-counter text-center mb-3">
+                                Question <span id="currentQuestion">1</span>/<span id="totalQuestions">0</span>
+                            </div>
+
+                            <!-- Container for skill test questions -->
+                            <div class="skill-questions">
+                                @{
+                                    int qIndex = 0;
+                                }
+                                @foreach (var question in (IEnumerable<Jobportalwebsite.Models.JobSkillTest>)ViewBag.SkillTestQuestions)
+                                {
+                                    <div class="form-group mb-3 skill-question" data-index="@qIndex" style="display:none;">
+                                        <label>@question.Question</label>
+                                        <div>
+                                            <label>
+                                                <input type="radio" name="SkillTestAnswers[@question.Id]" value="A" />
+                                                <strong>A:</strong> @question.OptionA
+                                            </label>
+                                            <br />
+                                            <label>
+                                                <input type="radio" name="SkillTestAnswers[@question.Id]" value="B" />
+                                                <strong>B:</strong> @question.OptionB
+                                            </label>
+                                            <br />
+                                            <label>
+                                                <input type="radio" name="SkillTestAnswers[@question.Id]" value="C" />
+                                                <strong>C:</strong> @question.OptionC
+                                            </label>
+                                            <br />
+                                            <label>
+                                                <input type="radio" name="SkillTestAnswers[@question.Id]" value="D" />
+                                                <strong>D:</strong> @question.OptionD
+                                            </label>
+                                        </div>
+                                        <!-- Inline error message (no longer required since unanswered is acceptable) -->
+                                        <span class="text-danger skill-error" style="display: none;">Please answer this question.</span>
+                                    </div>
+                                    qIndex++;
+                                }
+                            </div>
+
+                            <!-- Navigation buttons -->
+                            <div class="text-center">
+                                <button type="button" class="btn btn-secondary" id="prevQuestion" style="display:none;">
+                                    <i class="bi bi-arrow-left"></i> Back
+                                </button>
+                                <button type="button" class="btn btn-outline-success" id="nextQuestion">
+                                    Next <i class="bi bi-arrow-right"></i>
+                                </button>
+                                <!-- The submit button is hidden because submission happens automatically when time is up -->
+                                <button type="submit" class="btn btn-outline-success" id="submitSkillTest" style="display:none;">
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+
                 </div>
             </div>
         </div>
@@ -441,20 +208,79 @@
 </form>
 
 <script>
-    // Client-side file size validation (10MB max)
-    document.getElementById("cvUpload").addEventListener("change", function(event) {
-        const file = event.target.files[0];
-        if (file && file.size > 10 * 1024 * 1024) { // 10MB in bytes
-            alert("File size exceeds the 10MB limit.");
-            event.target.value = ""; // Clear the file input
+    // --- Phone Number Input Validation ---
+    document.getElementById("phoneNumber").addEventListener("input", function (event) {
+        const input = event.target;
+        input.value = input.value.replace(/[^0-9]/g, ""); // Allow only numeric characters
+        if (input.value.length > 11) {
+            input.value = input.value.slice(0, 11); // Limit to 11 digits
+        }
+        input.setCustomValidity('');
+        input.classList.remove('is-invalid');
+    });
+    document.getElementById("phoneNumber").addEventListener("blur", function (event) {
+        const input = event.target;
+        if (input.value.length !== 11) {
+            input.setCustomValidity("Phone number must be exactly 11 digits.");
+            input.classList.add('is-invalid');
         }
     });
 
-    function validateForm(formId) {
-        let valid = true;
-        const form = document.getElementById(formId);
-        const inputs = form.querySelectorAll('[required]');
+    // --- Section Navigation Functions ---
+    document.getElementById("nextToEducation").onclick = function () {
+        if (!validateSection("personalDetails")) {
+            alert("Please fill all required fields in Personal Details.");
+            return;
+        }
+        document.getElementById("personalDetails").style.display = "none";
+        document.getElementById("educationalHistory").style.display = "block";
+    };
 
+    document.getElementById("backToPersonalDetails").onclick = function () {
+        document.getElementById("educationalHistory").style.display = "none";
+        document.getElementById("personalDetails").style.display = "block";
+    };
+
+    document.getElementById("nextToJobExperience").onclick = function () {
+        if (!validateSection("educationalHistory")) {
+            alert("Please fill all required fields in Educational History.");
+            return;
+        }
+        document.getElementById("educationalHistory").style.display = "none";
+        document.getElementById("jobExperience").style.display = "block";
+    };
+
+    document.getElementById("backToEducation").onclick = function () {
+        document.getElementById("jobExperience").style.display = "none";
+        document.getElementById("educationalHistory").style.display = "block";
+    };
+
+    // When moving from Job Experience to Skill Test, display the Skill Test section.
+    if (document.getElementById("nextToSkillTest")) {
+        document.getElementById("nextToSkillTest").onclick = function () {
+            if (!validateSection("jobExperience")) {
+                alert("Please fill all required fields in Job Experience.");
+                return;
+            }
+            document.getElementById("jobExperience").style.display = "none";
+            document.getElementById("skillTest").style.display = "block";
+            // Initialize the timed skill test once it is shown
+            initializeSkillTest();
+        };
+    }
+    if (document.getElementById("backToJobExperienceFromSkill")) {
+        document.getElementById("backToJobExperienceFromSkill").onclick = function () {
+            // If needed, you can clear the timer or allow returning to the test.
+            document.getElementById("skillTest").style.display = "none";
+            document.getElementById("jobExperience").style.display = "block";
+        };
+    }
+
+    // --- Section Validation Function ---
+    function validateSection(sectionId) {
+        let valid = true;
+        const section = document.getElementById(sectionId);
+        const inputs = section.querySelectorAll('[required]');
         inputs.forEach(input => {
             if (!input.value.trim()) {
                 input.classList.add('is-invalid');
@@ -463,40 +289,118 @@
                 input.classList.remove('is-invalid');
             }
         });
-
         return valid;
     }
 
-    document.getElementById("nextToEducation").onclick = function() {
-        if (validateForm("personalDetails")) {
-            document.getElementById("personalDetails").style.display = "none";
-            document.getElementById("educationalHistory").style.display = "block";
-        }
-    };
+    // --- Final Form Submission (For other sections) ---
+    // Note: The Skill Test submission is now automated by timer.
+    document.getElementById("regForm").addEventListener("submit", function (e) {
+        // If the Skill Test is visible, we do not block submission even if some questions are unanswered.
+        // All answers (or blanks) will be submitted once time is up.
+    });
 
-    document.getElementById("backToPersonalDetails").onclick = function() {
-        document.getElementById("educationalHistory").style.display = "none";
+    // --- Skill Test Initialization with Timer, Navigation & Anti-Copy ---
+    function initializeSkillTest() {
+        // Prevent common copy shortcuts (this is not foolproof)
+        document.addEventListener("keydown", function (e) {
+            // Block Ctrl+C, Ctrl+P, and PrintScreen (key code 44)
+            if ((e.ctrlKey && (e.key === 'c' || e.key === 'C' || e.key === 'p' || e.key === 'P')) || e.keyCode === 44) {
+                e.preventDefault();
+            }
+        });
+
+        // Disable text selection and right-click in the Skill Test container
+        var skillTestContainer = document.getElementById("skillTest");
+        if (skillTestContainer) {
+            skillTestContainer.style.webkitUserSelect = "none";
+            skillTestContainer.style.MozUserSelect = "none";
+            skillTestContainer.style.msUserSelect = "none";
+            skillTestContainer.style.userSelect = "none";
+            skillTestContainer.oncontextmenu = function () { return false; };
+        }
+
+        // Initialize Skill Test Questions & Timer if the section exists
+        var skillTestSection = document.getElementById("skillTest");
+        if (skillTestSection) {
+            var skillQuestions = document.querySelectorAll(".skill-question");
+            var currentQuestionIndex = 0;
+            var totalQuestions = skillQuestions.length;
+            var timerDuration = 40; // seconds
+            var timerDisplay = document.getElementById("timerDisplay");
+            var timerInterval;
+
+            // Set total questions counter
+            document.getElementById("totalQuestions").textContent = totalQuestions;
+
+            // Function to show a specific question and update navigation buttons and counter
+            function showQuestion(index) {
+                skillQuestions.forEach(function (question, idx) {
+                    question.style.display = (idx === index) ? "block" : "none";
+                });
+                document.getElementById("currentQuestion").textContent = index + 1;
+                // Show/Hide navigation buttons based on question index
+                document.getElementById("prevQuestion").style.display = index === 0 ? "none" : "inline-block";
+                document.getElementById("nextQuestion").style.display = (index === totalQuestions - 1) ? "none" : "inline-block";
+            }
+
+            // Show the first question initially
+            showQuestion(currentQuestionIndex);
+
+            // Navigation: Next and Back buttons for the Skill Test
+            if (document.getElementById("nextQuestion")) {
+                document.getElementById("nextQuestion").addEventListener("click", function () {
+                    if (currentQuestionIndex < totalQuestions - 1) {
+                        currentQuestionIndex++;
+                        showQuestion(currentQuestionIndex);
+                    }
+                });
+            }
+            if (document.getElementById("prevQuestion")) {
+                document.getElementById("prevQuestion").addEventListener("click", function () {
+                    if (currentQuestionIndex > 0) {
+                        currentQuestionIndex--;
+                        showQuestion(currentQuestionIndex);
+                    }
+                });
+            }
+
+            // Start the timer when the Skill Test section is shown
+            function startTimer() {
+                var remainingTime = timerDuration;
+                timerDisplay.textContent = remainingTime;
+                timerInterval = setInterval(function () {
+                    remainingTime--;
+                    timerDisplay.textContent = remainingTime;
+                    if (remainingTime <= 0) {
+                        clearInterval(timerInterval);
+                        // Optionally disable the navigation buttons when time is up
+                        if(document.getElementById("nextQuestion")){
+                            document.getElementById("nextQuestion").disabled = true;
+                        }
+                        if(document.getElementById("prevQuestion")){
+                            document.getElementById("prevQuestion").disabled = true;
+                        }
+                        // Automatically submit the entire form
+                        document.getElementById("regForm").submit();
+                    }
+                }, 1000);
+            }
+            startTimer();
+        }
+    }
+
+    // --- Initial Section Visibility ---
+    document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("personalDetails").style.display = "block";
-    };
-
-    document.getElementById("nextToJobExperience").onclick = function() {
-        if (validateForm("educationalHistory")) {
-            document.getElementById("educationalHistory").style.display = "none";
-            document.getElementById("jobExperience").style.display = "block";
-        }
-    };
-
-    document.getElementById("backToEducation").onclick = function() {
+        document.getElementById("educationalHistory").style.display = "none";
         document.getElementById("jobExperience").style.display = "none";
-        document.getElementById("educationalHistory").style.display = "block";
-    };
-</script> *@
+        if (document.getElementById("skillTest")) {
+            document.getElementById("skillTest").style.display = "none";
+        }
+    });
+</script>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-
-
-
 
 
 

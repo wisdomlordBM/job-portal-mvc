@@ -5,7 +5,7 @@
 
     <div class="card shadow-lg p-3" style="max-width: 600px; margin: 0 auto;">
         <div class="card-body">
-            <form asp-action="CreateJob" method="post">
+            <form asp-action="CreateJob" method="post" enctype="multipart/form-data">
                 <!-- Hidden CompanyId -->
                 <input type="hidden" asp-for="CompanyId" value="@ViewBag.CompanyId" />
 
@@ -46,15 +46,38 @@
                 <!-- Salary -->
                 <div class="form-group mb-3">
                     <label for="Salary" class="form-label fw-bold">Salary</label>
-                    <input asp-for="Salary" class="form-control" type="number" step="0.01" placeholder="Enter salary" required />
+                    <input asp-for="Salary" class="form-control" type="number" step="0.01" placeholder="Enter salary" />
                     <span asp-validation-for="Salary" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="SalaryPeriod" class="form-label fw-bold">Salary Period</label>
+                    <select asp-for="SalaryPeriod" class="form-control" id="salaryPeriod" required>
+                        <option value="">Select salary period</option>
+                        <option value="PerHour">Per Hour</option>
+                        <option value="PerDay">Per Day</option>
+                        <option value="PerWeek">Per Week</option>
+                        <option value="PerMonth">Per Month</option>
+                        <option value="PerYear">Per Year</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Negotiable">Negotiable</option>
+                    </select>
+                    <span asp-validation-for="SalaryPeriod" class="text-danger"></span>
                 </div>
 
                 <!-- Image URL -->
                 <div class="form-group mb-3">
-                    <label for="ImageUrl" class="form-label fw-bold">Image URL</label>
-                    <input asp-for="ImageUrl" class="form-control" placeholder="Enter URL for company or building image" />
-                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                    <label class="form-label fw-bold">Company / Job Image</label>
+
+                    <input type="file"
+                           name="imageFile"
+                           id="imageFile"
+                           class="form-control"
+                           accept=".jpg,.jpeg,.png,.webp" />
+
+                    <img id="previewImage"
+                         src="#"
+                         style="display:none;max-width:100%;margin-top:15px;border-radius:10px;" />
                 </div>
 
                 <!-- Submit Button -->
@@ -71,60 +94,44 @@
     </div>
 </div>
 
+<script>
+    const salaryPeriod = document.getElementById('salaryPeriod');
+    const salary = document.getElementById('Salary');
+
+    function updateSalaryInput() {
+        const isNegotiable = salaryPeriod.value === 'Negotiable';
+        salary.disabled = isNegotiable;
+        salary.required = !isNegotiable;
+        if (isNegotiable) salary.value = '';
+    }
+
+    salaryPeriod.addEventListener('change', updateSalaryInput);
+    updateSalaryInput();
+</script>
+<script>
+    const imageInput = document.getElementById("imageFile");
+    const preview = document.getElementById("previewImage");
+
+    imageInput.addEventListener("change", function () {
+
+        if (this.files.length > 0) {
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+
+            reader.readAsDataURL(this.files[0]);
+        }
+
+    });
+</script>
 
 
 
-@* @model Jobportalwebsite.Models.Job
 
-<div class="container">
-    <h1 class="mt-4">Create Job</h1>
-    <form asp-action="CreateJob" method="post" class="mt-4">
-        <!-- Hidden CompanyId -->
-        <input type="hidden" asp-for="CompanyId" value="@ViewBag.CompanyId" />
-
-        <div class="form-group">
-            <label asp-for="JobTitle" class="control-label"></label>
-            <input asp-for="JobTitle" class="form-control" />
-            <span asp-validation-for="JobTitle" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Description" class="control-label"></label>
-            <textarea asp-for="Description" class="form-control"></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Location" class="control-label"></label>
-            <input asp-for="Location" class="form-control" />
-            <span asp-validation-for="Location" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="EmploymentType" class="control-label"></label>
-            <select asp-for="EmploymentType" class="form-control">
-                <option value="">Select Employment Type</option>
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Contract">Contract</option>
-                <option value="Internship">Internship</option>
-            </select>
-            <span asp-validation-for="EmploymentType" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="Salary" class="control-label"></label>
-            <input asp-for="Salary" class="form-control" type="number" step="0.01" />
-            <span asp-validation-for="Salary" class="text-danger"></span>
-        </div>
-
-        <!-- Image URL Field -->
-        <div class="form-group">
-            <label asp-for="ImageUrl" class="control-label">Image URL</label>
-            <input asp-for="ImageUrl" class="form-control" placeholder="Enter URL for company or building image" />
-            <span asp-validation-for="ImageUrl" class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Create</button>
-        <a asp-controller="Job" asp-action="Index" class="btn btn-secondary">Back to Job Listings</a>
-    </form>
-</div> *@
 
 
 

@@ -1,0 +1,37 @@
+﻿@model Application
+@{
+    var skillTestQuestions = ViewBag.SkillTestQuestions as IEnumerable<JobSkillTest>;
+}
+
+<form method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="jobId" value="@ViewBag.Job.Id" />
+    <input type="hidden" name="UserId" value="@ViewBag.User.Id" />
+
+    <div class="form-group">
+        <label for="Description">Description</label>
+        <textarea id="Description" name="Description" class="form-control" required></textarea>
+    </div>
+
+    <!-- Job Skill Test Questions -->
+    @if (skillTestQuestions != null)
+    {
+        <h4>Skill Test</h4>
+        @foreach (var question in skillTestQuestions)
+        {
+            <div class="form-group">
+                <label>@question.Question</label>
+                <input type="hidden" name="SkillTestAnswers[@question.Id].JobSkillTestId" value="@question.Id" />
+                <div>
+                    <input type="radio" name="SkillTestAnswers[@question.Id].SelectedAnswer" value="A" required /> @question.OptionA
+                    <input type="radio" name="SkillTestAnswers[@question.Id].SelectedAnswer" value="B" required /> @question.OptionB
+                    <input type="radio" name="SkillTestAnswers[@question.Id].SelectedAnswer" value="C" required /> @question.OptionC
+                    <input type="radio" name="SkillTestAnswers[@question.Id].SelectedAnswer" value="D" required /> @question.OptionD
+                </div>
+            </div>
+        }
+    }
+
+    <button type="submit" class="btn btn-primary">Submit Application</button>
+</form>

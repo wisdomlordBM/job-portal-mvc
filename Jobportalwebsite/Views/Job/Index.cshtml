@@ -1,14 +1,8 @@
-﻿
-
-
-
-
-@model IEnumerable<Job>
+﻿@model IEnumerable<Job>
 
 @{
     Layout = "~/Views/Shared/_Jobseekers.cshtml";
 }
-
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -23,24 +17,16 @@
     </div>
 }
 
-
-
-
-
 <div class="container">
     <h1 class="mt-4 text-center">Job Listings</h1>
-
-   
     <div class="input-group mb-4" style="max-width: 600px; margin: 0 auto;">
         <input id="jobSearchInput" type="text" class="form-control form-control-lg" placeholder="Search jobs by title, location, or type..." onkeyup="filterJobs()" aria-label="Search Jobs" style="border-radius: 30px 0 0 30px; border-right: none;">
         <button class="btn btn-outline-success" id="searchButton" style="border-radius: 0 30px 30px 0; padding: 0 25px; font-size: 1rem;">
             🔍 Search Jobs
         </button>
     </div>
-
     <div class="container mt-5">
         <div class="row">
-            
             <div class="col-md-4 mb-4">
                 <div class="card p-4 shadow-sm rounded-3" style="background-color: #f4f7fa;">
                     <h4 class="card-title text-center">Welcome to Your Career Journey</h4>
@@ -48,8 +34,6 @@
                     <a href="/images/459.jpg" class="btn btn-outline-success w-100">Start Searching</a>
                 </div>
             </div>
-
-            
             <div class="col-md-4 mb-4">
                 <div class="card p-4 shadow-sm rounded-3" style="background-color: #e9f7ff;">
                     <h5 class="card-title">Job Search Tips</h5>
@@ -61,8 +45,6 @@
                     <a href="/images/459.jpg" class="btn btn-outline-success w-100">Read More Tips</a>
                 </div>
             </div>
-
-            
             <div class="col-md-4 mb-4">
                 <div class="card p-4 shadow-sm rounded-3" style="background-color: #f1f5f9;">
                     <h5 class="card-title">Top Companies Hiring</h5>
@@ -76,10 +58,6 @@
             </div>
         </div>
     </div>
-
-
-
-    
     <div class="modal fade" id="jobDescriptionModal" tabindex="-1" aria-labelledby="jobDescriptionModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -96,48 +74,15 @@
             </div>
         </div>
     </div>
-
-
-    <div id="jobList" class="row">
+    <div id="jobList">
         @foreach (var job in Model)
         {
-            <div class="col-md-4 mb-4 job-card">
-                <div class="card shadow-sm h-100" style="border-radius: 15px;">
-                    <img src="~/@job.ImageUrl" alt="Job Image" class="card-img-top" style="height: 150px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title"><strong>Job Title:</strong> <span class="job-title">@job.JobTitle</span></h5>
-                        <p>
-                            <strong>Description:</strong>
-                            @if (job.Description.Length > 100)
-                            {
-                                @job.Description.Substring(0, 100)
-
-
-                                <a href="#" class="btn btn-link text-primary" data-bs-toggle="modal" data-bs-target="#jobDescriptionModal" data-description="@job.Description" style="text-decoration: none;">
-                                    Read More
-                                </a>
-                                    }
-                                    else
-                                    {
-                        @job.Description
-                                    }
-                    </p>
-                        <p><strong>Location:</strong> <span class="job-location">@job.Location</span></p>
-                        <p><strong>Employment Type:</strong> <span class="job-employment">@job.EmploymentType</span></p>
-                        <p><strong>Salary:</strong> @job.Salary.ToString("C2", new System.Globalization.CultureInfo("ig-NG"))</p>
-                        
-                        <p><strong>Date Posted:</strong> <span class="job-date">@job.DatePosted.ToString("MMMM dd, yyyy")</span></p>
-                        <div class="d-flex justify-content-center">
-                            <a asp-controller="Jobseekers" asp-action="Create" asp-route-jobId="@job.Id" class="btn btn-outline-success">Apply</a>
-                        </div>
-                    </div>
-                </div>
+            <div class="job-card">
+                <partial name="_JobListingRow" model="job" />
             </div>
         }
     </div>
-
 </div>
-
 <div class="mt-5">
     <h2 class="text-center mb-4">Why Choose Us?</h2>
     <div class="row">
@@ -161,33 +106,22 @@
         </div>
     </div>
 </div>
-
-
 <div class="text-center mt-5">
     <h2 class="fw-bold">Ready to Start Your Career Journey?</h2>
     <p class="lead">Create your profile and unlock new opportunities today.</p>
     <a href="/images/459.jpg" class="btn btn-outline-success">Apply Now</a>
 </div>
-
 <script>
     function filterJobs() {
         const input = document.getElementById('jobSearchInput').value.toLowerCase();
         const jobCards = document.querySelectorAll('.job-card');
 
         jobCards.forEach(card => {
-            const title = card.querySelector('.job-title').innerText.toLowerCase();
-            const location = card.querySelector('.job-location').innerText.toLowerCase();
-            const employment = card.querySelector('.job-employment').innerText.toLowerCase();
-
-            if (title.includes(input) || location.includes(input) || employment.includes(input)) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
+            const text = card.innerText.toLowerCase();
+            card.style.display = text.includes(input) ? 'block' : 'none';
         });
     }
 </script>
-
 <script>
     const jobDescriptionModal = document.getElementById('jobDescriptionModal');
     jobDescriptionModal.addEventListener('show.bs.modal', function (event) {
@@ -197,31 +131,8 @@
         modalBody.textContent = description; 
     });
 </script>
-
 <style>
     .job-card:hover {
         transform: scale(1.05);
     }
 </style> 
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

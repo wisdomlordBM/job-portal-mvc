@@ -6,7 +6,15 @@
 
 <h2 class="mb-4 text-center">Manage Companies</h2>
 
-<div class="row">
+<div class="text-center mb-3">
+    <button id="showCardView" class="btn btn-primary me-2">Card View</button>
+    <button id="showTableView" class="btn btn-secondary me-2">Table View</button>
+    <button id="downloadPdf" class="btn btn-success">Download as PDF</button>
+    <button id="downloadExcel" class="btn btn-success">Download as Excel</button>
+
+</div>
+
+<div id="cardView" class="row">
     @foreach (var company in Model)
     {
         <div class="col-md-6 mb-4">
@@ -45,94 +53,201 @@
     }
 </div>
 
+<div id="tableView" class="d-none">
+    <div class="table-responsive">
+        <table id="companyTable" class="table table-bordered table-striped align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Industry</th>
+                    <th>Location</th>
+                    <th>Email</th>
+                    <th>Website</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var company in Model.Select((value, index) => new { Value = value, Index = index + 1 }))
+                {
+                    <tr>
+                        <td>@company.Index</td>
+                        <td>@company.Value.Name</td>
+                        <td>@company.Value.Industry</td>
+                        <td>@company.Value.Location</td>
+                        <td>
+                            <a href="mailto:@company.Value.Email">@company.Value.Email</a>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(company.Value.WebsiteUrl))
+                            {
+                                <a href="@company.Value.WebsiteUrl" target="_blank">@company.Value.WebsiteUrl</a>
+                            }
+                            else
+                            {
+                                <span>No website provided</span>
+                            }
+                        </td>
+                        <td>@company.Value.Description</td>
+                        <td>
+                            <a href="@Url.Action("DeleteCompany", "Admin", new { id = company.Value.Id })"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Are you sure you want to delete this company?')">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+    // Utility function to get the current timestamp for file names
+    function getCurrentTimestamp() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
 
-
-@* @model IEnumerable<Jobportalwebsite.Models.Company>
-@{
-    Layout = "~/Views/Shared/_Admin.cshtml";
-    ViewData["Title"] = "Manage Companies";
-}
-
-<h2 class="mb-4">Manage Companies</h2>
-
-<div class="row">
-    @foreach (var company in Model)
-    {
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-body">
-                    <h5 class="card-title">@company.Name</h5>
-                    <p class="card-text"><strong>Industry:</strong> @company.Industry</p>
-                    <p class="card-text">
-                        <strong>Website:</strong>
-                        @if (!string.IsNullOrEmpty(company.WebsiteUrl))
-                        {
-                            <a href="@company.WebsiteUrl" target="_blank">@company.WebsiteUrl</a>
-                        }
-                        else
-                        {
-                            <span>No website provided</span>
-                        }
-                    </p>
-                    <div class="d-flex justify-content-end">
-                        <a href="@Url.Action("DeleteCompany", "Admin", new { id = company.Id })"
-                           class="btn btn-danger btn-sm rounded-3"
-                           onclick="return confirm('Are you sure you want to delete this company?')">
-                            Delete
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        return `${year}-${month}-${day}_${hours}:${minutes}:${seconds}`; // Format: YYYY-MM-DD_HH:MM:SS
     }
-</div> *@
 
+    // Set initial visibility state for buttons
+    document.addEventListener('DOMContentLoaded', function () {
+        // Default to Card View: Hide download buttons
+        document.getElementById('cardView').classList.remove('d-none');
+        document.getElementById('tableView').classList.add('d-none');
+        document.getElementById('downloadPdf').classList.add('d-none');
+        document.getElementById('downloadExcel').classList.add('d-none');
 
+        // Update button styles for default Card View
+        document.getElementById('showCardView').classList.add('btn-primary');
+        document.getElementById('showCardView').classList.remove('btn-secondary');
+        document.getElementById('showTableView').classList.add('btn-secondary');
+        document.getElementById('showTableView').classList.remove('btn-primary');
+    });
 
-@* @model IEnumerable<Jobportalwebsite.Models.Company>
-@{
-    Layout = "~/Views/Shared/_Admin.cshtml";
-}
-@{
-    ViewData["Title"] = "Manage Companies";
-}
+    // Show Card View and hide download buttons
+    document.getElementById('showCardView').addEventListener('click', function () {
+        document.getElementById('cardView').classList.remove('d-none');
+        document.getElementById('tableView').classList.add('d-none');
+        document.getElementById('downloadPdf').classList.add('d-none');
+        document.getElementById('downloadExcel').classList.add('d-none');
 
-<h2>Manage Companies</h2>
+        // Update button styles
+        this.classList.add('btn-primary');
+        this.classList.remove('btn-secondary');
+        document.getElementById('showTableView').classList.add('btn-secondary');
+        document.getElementById('showTableView').classList.remove('btn-primary');
+    });
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Company Name</th>
-            <th>Industry</th>
-            <th>Website URL</th>  
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var company in Model)
-        {
-            <tr>
-                <td>@company.Name</td>
-                <td>@company.Industry</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(company.WebsiteUrl))
-                    {
-                        <a href="@company.WebsiteUrl" target="_blank">@company.WebsiteUrl</a>
-                    }
-                    else
-                    {
-                        <span>No website provided</span>
-                    }
-                </td>
-                <td>
-                    
-                
-                    <a href="@Url.Action("DeleteCompany", "Admin", new { id = company.Id })" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this company?')">Delete</a>
-                </td>
-            </tr>
+    // Show Table View and display download buttons
+    document.getElementById('showTableView').addEventListener('click', function () {
+        document.getElementById('tableView').classList.remove('d-none');
+        document.getElementById('cardView').classList.add('d-none');
+        document.getElementById('downloadPdf').classList.remove('d-none');
+        document.getElementById('downloadExcel').classList.remove('d-none');
+
+        // Update button styles
+        this.classList.add('btn-primary');
+        this.classList.remove('btn-secondary');
+        document.getElementById('showCardView').classList.add('btn-secondary');
+        document.getElementById('showCardView').classList.remove('btn-primary');
+    });
+
+    // PDF and Excel export functions remain unchanged
+    document.getElementById('downloadPdf').addEventListener('click', function () {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+        const table = document.getElementById('companyTable');
+        if (!table) {
+            console.error('Table element not found!');
+            return;
         }
-    </tbody>
-</table> *@
+
+        const headers = [];
+        const rows = [];
+
+        table.querySelectorAll('thead tr th').forEach((th, index) => {
+            if (index !== table.rows[0].cells.length - 1) { // Skip the "Actions" column
+                headers.push(th.innerText.trim());
+            }
+        });
+
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const row = [];
+            tr.querySelectorAll('td').forEach((td, index) => {
+                if (index !== tr.cells.length - 1) { // Skip the "Actions" column
+                    row.push(td.innerText.trim());
+                }
+            });
+            rows.push(row);
+        });
+
+        pdf.autoTable({
+            head: [headers],
+            body: rows,
+            margin: { top: 10 },
+            theme: 'striped',
+            styles: { fontSize: 6 },
+            headStyles: { fillColor: [22, 160, 133] }
+        });
+
+        pdf.save(`companies_${getCurrentTimestamp()}.pdf`);
+    });
+
+    document.getElementById('downloadExcel').addEventListener('click', function () {
+        const table = document.getElementById('companyTable');
+        if (!table) {
+            console.error('Table element not found!');
+            return;
+        }
+
+        const data = [];
+        const headers = [];
+
+        table.querySelectorAll('thead tr th').forEach((th, index) => {
+            if (index !== table.rows[0].cells.length - 1) { // Skip the "Actions" column
+                headers.push(th.innerText.trim());
+            }
+        });
+
+        data.push(headers);
+
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const row = [];
+            tr.querySelectorAll('td').forEach((td, index) => {
+                if (index !== tr.cells.length - 1) { // Skip the "Actions" column
+                    row.push(td.innerText.trim());
+                }
+            });
+            data.push(row);
+        });
+
+        const worksheet = XLSX.utils.aoa_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Companies");
+
+        XLSX.writeFile(workbook, `companies_${getCurrentTimestamp()}.xlsx`);
+    });
+</script>
+
+
+
+
+
+
+
+
 
 
 
