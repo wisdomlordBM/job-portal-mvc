@@ -14,7 +14,6 @@ namespace Jobportalwebsite.Services
         public string? JobTitle { get; set; }
         public string? CompanyName { get; set; }
 
-        // Add a property to associate notifications with a user
         public string? UserId { get; set; } // User identifier, e.g., ApplicationUser.Id
     }
 

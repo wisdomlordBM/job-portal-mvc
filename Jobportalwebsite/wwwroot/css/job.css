@@ -1,0 +1,387 @@
+/* Loader Container */
+#loading-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f0f0; /* Light background */
+    position: relative;
+    font-family: 'Arial', sans-serif;
+    opacity: 1; /* Start with full visibility */
+    transition: opacity 1s ease-out; /* Add a smooth fade-out transition */
+}
+
+/* Loading Text */
+.load-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #3498db; /* Primary color */
+    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: fadeText 3s ease-in-out infinite;
+}
+
+/* Fade Text Animation */
+@keyframes fadeText {
+    0%, 100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Circle Styles */
+.loading-circle {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #3498db; /* Primary color */
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: rotate 3s linear infinite, grow 3s ease-out infinite; /* Slow rotation and growth */
+    position: relative;
+    margin-bottom: 20px;
+}
+
+/* Rotation Animation */
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Grow Animation */
+@keyframes grow {
+    0% {
+        transform: scale(0.5);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Dots Progress Indicator (new addition) */
+.dots {
+    font-size: 24px;
+    color: #3498db;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    animation: dot-blink 1.5s infinite;
+}
+
+    .dots span {
+        opacity: 0;
+        animation: dot-bounce 1.5s infinite ease-in-out;
+        margin-left: 5px;
+    }
+
+        .dots span:nth-child(1) {
+            animation-delay: 0.3s;
+        }
+
+        .dots span:nth-child(2) {
+            animation-delay: 0.6s;
+        }
+
+        .dots span:nth-child(3) {
+            animation-delay: 0.9s;
+        }
+
+/* Dot Blink Animation */
+@keyframes dot-blink {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Dot Bounce Animation */
+@keyframes dot-bounce {
+    0%, 100% {
+        transform: scale(0);
+    }
+
+    50% {
+        transform: scale(1);
+    }
+}
+
+.profile-picture {
+    width: 150px; /* Adjust size as needed */
+    height: 150px; /* Ensure it matches width for perfect circle */
+    border-radius: 50%; /* Makes the image circular */
+    object-fit: cover; /* Ensures the image scales correctly within the circle */
+    border: 2px solid #ccc; /* Optional: Adds a border */
+    margin: 0 auto; /* Centers the image */
+}
+
+textarea {
+    resize: none;
+}
+
+img.rounded-circle {
+    object-fit: cover;
+}
+
+
+
+/* Loader Container */
+/*#loading-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f0f0;*/ /* Light background */
+/*}*/
+
+/* Spinner Styles */
+/*.loading-spinner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+    position: relative;
+}
+
+.spinner-circle {
+    width: 15px;
+    height: 15px;
+    margin: 0 5px;
+    background-color: #3498db;*/ /* Primary color */
+    /*border-radius: 50%;
+    animation: bounce 5s infinite ease-in-out;*/ /* Slowed down to 5s */
+/*}
+
+    .spinner-circle:nth-child(2) {
+        animation-delay: -1.12s;*/ /* Adjusted to match slower timing */
+    /*}
+
+    .spinner-circle:nth-child(3) {
+        animation-delay: -1.6s;*/ /* Adjusted to match slower timing */
+    /*}
+
+    .spinner-circle:nth-child(4) {
+        animation-delay: -3s;*/ /* Adjusted to match slower timing */
+    /*}*/
+
+/* Bounce Animation */
+/*@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+
+    40% {
+        transform: scale(1);
+    }
+}*/
+
+/* Text Loading Animation */
+/*.load-text {
+    margin-top: 20px;
+    font-family: 'Arial', sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: #3498db;*/ /* Primary color */
+/*}
+
+.text-load {
+    display: inline-block;
+    animation: fade 5s ease-in-out forwards;*/ /* Fade animation lasts 5 seconds */
+/*}
+
+    .text-load:nth-child(odd) {
+        animation-delay: 2.8s;*/ /* Adjusted for smoother effect */
+    /*}
+
+    .text-load:nth-child(even) {
+        animation-delay: 3s;*/ /* Adjusted for smoother effect */
+    /*}*/
+
+/* Fade Animation */
+/*@keyframes fade {
+    0%, 100% {
+        opacity: 1;*/ /* Start and end at full opacity */
+    /*}
+
+    50% {
+        opacity: 0;*/ /* Fade to transparent halfway */
+    /*}
+}*/
+
+/* This will ensure the loader stays visible for at least 5 seconds */
+/*#loading-area {
+    animation: fadeOut 5s ease-in-out forwards;
+}*/
+
+/* Fade out animation */
+/*@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}*/
+.notification {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+    .notification.read {
+        background-color: #e0e0e0;
+    }
+
+.notification-header {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.notification-body {
+    margin-top: 5px;
+    font-size: 1rem;
+}
+
+.notification-footer {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.notification.new-job {
+    border-left: 5px solid #007bff; /* Blue for new jobs */
+}
+
+.notification.new-company {
+    border-left: 5px solid #28a745; /* Green for new companies */
+}
+
+.mark-read-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+    .mark-read-btn:hover {
+        background-color: #0056b3;
+    }
+
+
+
+
+
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+
+
+
+/* Simplified and modernized styles */
+.container-fluid.wall {
+    background-image: url('/images/obi4.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 65vh;
+    color: white;
+}
+
+.carousel-caption h1 {
+    font-size: 3rem;
+}
+
+.work {
+    text-align: center;
+    color: #12bcaa;
+}
+
+/* More polished button hover */
+.btn-primary:hover {
+    background-color: #0fa293;
+}
+
+.btn-outline-secondary:hover {
+    border-color: #12bcaa;
+    color: #12bcaa;
+}
+
+/* Improved responsiveness */
+@media (max-width: 768px) {
+    .carousel-item img {
+        width: 100%; /* Example to make images responsive */
+        height: auto; /* Maintain aspect ratio */
+    }
+}
+
+
+<!-- Your HTML content goes here -->
+#notificationBell {
+    cursor: pointer;
+}
+
+#notificationCount {
+    font-size: 0.75rem;
+    display: none;
+}
+
+.dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+    width: 300px;
+}
+.is-invalid {
+    border: 1px solid red;
+    background-color: #f8d7da;
+}

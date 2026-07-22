@@ -33,19 +33,3 @@
     </div>
 </div>
 
-@* @model Jobportalwebsite.Models.UploadCVViewModel
-
-<h2>Upload CV</h2>
-
-<form asp-action="UploadCV" method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="ApplicationId" />
-
-    <div class="form-group">
-        <label asp-for="CV" class="form-label">Upload Your CV</label>
-        <input type="file" asp-for="CV" class="form-control" accept=".pdf,.doc,.docx" />
-        <span asp-validation-for="CV" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-success">Upload</button>
-</form>
- *@

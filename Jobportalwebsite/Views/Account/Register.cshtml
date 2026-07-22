@@ -1,16 +1,4 @@
-﻿
-
-
-
-
-
-
-
-
-
-
-
-@model Jobportalwebsite.Viewmodel.RegistrationViewModel
+﻿@model Jobportalwebsite.Viewmodel.RegistrationViewModel
 @{
     Layout = "~/Views/Shared/_AccountLayout.cshtml";
 }
@@ -97,9 +85,15 @@
                         <span asp-validation-for="State" class="text-danger"></span>
                     </div>
                     <div class="col-md-6 form-group">
-                        <label for="Country">Country</label>
-                        <input type="text" asp-for="Country" class="form-control" placeholder="Enter your country" />
-                        <span asp-validation-for="Country" class="text-danger"></span>
+                        <label asp-for="CountryId">Country</label>
+                        <select asp-for="CountryId" class="form-control">
+                            <option value="">Select your country</option>
+                            @foreach (Country country in ViewBag.Countries)
+                            {
+                                <option value="@country.Id">@country.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CountryId" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -119,37 +113,43 @@
                     <span>Already have an account? </span>
                     <a asp-area="" asp-controller="Account" asp-action="Login" class="fw-bold">Login here</a>
                 </div>
+
             </form>
+            <!-- Other form content -->
+
+            <div class="text-center mt-4">
+                <p>Or login with:</p>
+                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                    <input type="hidden" name="provider" value="Google" />
+                    <input type="hidden" name="role" value="Jobseeker" />
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                </form>
+
+                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                    <input type="hidden" name="provider" value="Facebook" />
+                    <input type="hidden" name="role" value="Jobseeker" />
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fab fa-facebook"></i> Facebook
+                    </button>
+                </form>
+                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                    <input type="hidden" name="provider" value="Microsoft" />
+                    <input type="hidden" name="role" value="Jobseeker" />
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <i class="fab fa-microsoft"></i> Microsoft
+                    </button>
+                </form>
+            </div>
+
+
         </div>
     </div>
 </div>
 
 
-@* @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.0/jquery.validate.unobtrusive.min.js"></script>
 
-    <script>
-        // Enforce numeric input and limit to 11 digits
-        document.getElementById("PhoneNumber").addEventListener("input", function (event) {
-            const input = event.target;
-            input.value = input.value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
-
-            if (input.value.length > 11) {
-                input.value = input.value.slice(0, 11); // Limit to 11 digits
-            }
-        });
-
-        // Validate on blur (optional)
-        document.getElementById("PhoneNumber").addEventListener("blur", function () {
-            const input = event.target;
-            if (input.value.length !== 11) {
-                alert("Phone number must be exactly 11 digits.");
-                input.focus();
-            }
-        });
-    </script>
-} *@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.0/jquery.validate.unobtrusive.min.js"></script>

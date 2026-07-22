@@ -1,0 +1,70 @@
+﻿@model Jobportalwebsite.Models.Company
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height:100vh; padding-top:50px;">
+    <div class="card shadow-lg" style="width:40rem; border-radius:20px;">
+        <div class="card-body p-5">
+            <partial name="_OnboardingSteps" model="Jobportalwebsite.Models.CompanyOnboardingStep.Branding" />
+
+            <h2 class="card-title text-center mb-4">Branding</h2>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <form asp-action="OnboardingBranding" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Company Logo</label>
+                    <input type="file" name="logoFile" id="logoFile" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                    <small class="text-muted">JPG, PNG, JPEG, or WEBP. Max 5MB.</small>
+                    @if (!string.IsNullOrEmpty(Model.ProfilePicturePath))
+                    {
+                        <img src="@Model.ProfilePicturePath" class="d-block mt-2" style="max-width:120px;border-radius:8px;" />
+                    }
+                    <img id="logoPreview" src="#" style="display:none;max-width:120px;margin-top:10px;border-radius:8px;" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Cover Banner</label>
+                    <input type="file" name="coverBannerFile" id="coverBannerFile" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                    <small class="text-muted">JPG, PNG, JPEG, or WEBP. Max 5MB.</small>
+                    @if (!string.IsNullOrEmpty(Model.CoverBannerPath))
+                    {
+                        <img src="@Model.CoverBannerPath" class="d-block mt-2" style="max-width:100%;border-radius:8px;" />
+                    }
+                    <img id="bannerPreview" src="#" style="display:none;max-width:100%;margin-top:10px;border-radius:8px;" />
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Continue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function wirePreview(inputId, previewId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        input.addEventListener("change", function () {
+            if (this.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = e => { preview.src = e.target.result; preview.style.display = "block"; };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+    wirePreview("logoFile", "logoPreview");
+    wirePreview("coverBannerFile", "bannerPreview");
+</script>

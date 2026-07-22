@@ -1,0 +1,37 @@
+﻿@model Jobportalwebsite.Models.Company
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height:100vh; padding-top:50px;">
+    <div class="card shadow-lg" style="width:40rem; border-radius:20px;">
+        <div class="card-body p-5">
+            <partial name="_OnboardingSteps" model="Jobportalwebsite.Models.CompanyOnboardingStep.OfficeInfo" />
+
+            <h2 class="card-title text-center mb-4">Office Information</h2>
+
+            <form asp-action="OnboardingOffice" asp-route-id="@Model.Id" method="post">
+                <div class="mb-3">
+                    <label asp-for="Address" class="form-label fw-bold">Address</label>
+                    <input asp-for="Address" class="form-control" placeholder="Street address" required />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="City" class="form-label fw-bold">City</label>
+                    <input asp-for="City" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="State" class="form-label fw-bold">State</label>
+                    <input asp-for="State" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PostalCode" class="form-label fw-bold">Postal Code</label>
+                    <input asp-for="PostalCode" class="form-control" required />
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">Finish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

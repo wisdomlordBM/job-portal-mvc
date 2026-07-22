@@ -41,8 +41,14 @@
                         <li class="nav-item">
                             <a class="nav-link " asp-area="" asp-controller="Job" asp-action="Index">Jobs</a>
                         </li>
-                    
 
+                        <li class="nav-item">
+
+                            <!-- Add to the navbar or wherever you want the chat icon -->
+                            <a href="@Url.Action("Index", "Chat")" class="btn btn-primary">
+                                <i class="bi bi-chat"></i> Chat
+                            </a>
+                        </li>
                     </ul>
 
 

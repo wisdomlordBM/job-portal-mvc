@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Jobportalwebsite.Services;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Jobportalwebsite.Controllers
 {
@@ -21,7 +23,11 @@ namespace Jobportalwebsite.Controllers
         public IActionResult Index()
         {
             // Fetch jobs that are posted
-            IEnumerable<Job> objJobList = _context.Jobs.Where(x => x.PostStatus == JobPostStatus.Posted);
+            IEnumerable<Job> objJobList = _context.Jobs
+                .Include(job => job.Company)
+                .ThenInclude(company => company!.Country)
+                .ThenInclude(country => country!.Currency)
+                .Where(x => x.PostStatus == JobPostStatus.Posted);
             var listedJobs = objJobList.OrderByDescending(y => y.DatePosted);
 
             // Fetch notifications for the logged-in user
@@ -36,90 +42,6 @@ namespace Jobportalwebsite.Controllers
 
             return View(listedJobs);
         }
-
-
-        //public IActionResult Index()
-        //{
-        //    // Fetch jobs that are posted
-        //    IEnumerable<Job> objJobList = _context.Jobs.Where(x => x.PostStatus == JobPostStatus.Posted);
-        //    var listedJobs = objJobList.OrderByDescending(y => y.DatePosted);
-
-        //    // Fetch notifications for the logged-in user
-        //    var notifications = _context.Notifications
-        //        .Where(n => n.UserId == User.Identity.Name) // Ensure User.Identity.Name matches your user identifier
-        //        .OrderByDescending(n => n.Date)
-        //        .Take(10)
-        //        .ToList();
-
-        //    // Get the current logged-in user's ID
-        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        //    // Add a flag to each job whether the user has already applied
-        //    foreach (var job in listedJobs)
-        //    {
-        //        // Check if the logged-in user has already applied for this job
-        //        var existingApplication = _context.Applications
-        //            .FirstOrDefault(a => a.JobId == job.Id && a.UserId == userId);
-
-        //        // Add a flag indicating if the user has already applied
-        //        job.HasApplied = existingApplication != null;
-        //    }
-
-        //    ViewData["Notifications"] = notifications;
-
-        //    return View(listedJobs);
-        //}
-
-
-
-
-        //public IActionResult Index()
-        //{
-        //    IEnumerable<Job> objJobList = _context.Jobs.Where(x => x.PostStatus == JobPostStatus.Posted);
-        //    var listedJobs = objJobList.OrderByDescending(y => y.DatePosted);
-
-        //    // Fetch notifications for the logged-in user
-        //    var notifications = _context.Notifications
-        //        .Where(n => n.UserId == User.Identity.Name) // Ensure User.Identity.Name matches your user identifier
-        //        .OrderByDescending(n => n.Date)
-        //        .Take(10)
-        //        .ToList();
-
-        //    ViewData["Notifications"] = notifications;
-
-        //    return View(listedJobs);
-        //}
-
-        //public IActionResult Index()
-        //{
-        //    // Fetching jobs with the given condition
-        //    IEnumerable<Job> objJobList = _context.Jobs.Where(x => x.PostStatus == JobPostStatus.Posted);
-        //    var listedJobs = objJobList.OrderByDescending(y => y.DatePosted);
-
-        //    // Fetching notifications (example)
-        //    var notifications = _context.Notifications // Replace with your actual notifications retrieval logic
-        //        .Where(n => n.UserId == User.Identity.Name) // Assuming User.Identity.Name holds the current user's identifier
-        //        .OrderByDescending(n => n.DateCreated)
-        //        .Take(10) // Limit to the latest 10 notifications
-        //        .Select(n => n.Message) // Assuming `Message` contains the notification text
-        //        .ToList();
-
-        //    // Passing notifications to the view
-        //    ViewData["Notifications"] = notifications;
-
-        //    return View(listedJobs);
-        //}
-
-        //public IActionResult Index()
-        //{
-        //    IEnumerable<Job> objJobList = _context.Jobs.Where(x => x.PostStatus == JobPostStatus.Posted);
-        //    var listedJobs = objJobList.OrderByDescending(y => y.DatePosted);
-        //    return View(listedJobs);
-        //    //return View(objJobList);
-        //}
-
-
-
         // Admin approves a job
         public IActionResult ApproveJob(int id)
         {
@@ -135,7 +57,12 @@ namespace Jobportalwebsite.Controllers
 
         public IActionResult AllJobs()
         {
-            var jobs = _context.Jobs.Where(j => j.PostStatus == JobPostStatus.Posted).ToList();
+            var jobs = _context.Jobs
+                .Include(job => job.Company)
+                .ThenInclude(company => company!.Country)
+                .ThenInclude(country => country!.Currency)
+                .Where(j => j.PostStatus == JobPostStatus.Posted)
+                .ToList();
             return View(jobs);
         }
 
@@ -154,13 +81,12 @@ namespace Jobportalwebsite.Controllers
             ViewBag.CompanyId = company.Id; // Pass CompanyId to the view
             return View();
         }
-        //Post
-     
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateJob(Job job)
+        public async Task<IActionResult> CreateJob(Job job, IFormFile? imageFile)
         {
+            ValidateSalary(job);
+
             if (ModelState.IsValid)
             {
                 var company = _context.Companies.FirstOrDefault(c => c.Email == User.Identity.Name);
@@ -172,63 +98,43 @@ namespace Jobportalwebsite.Controllers
 
                 job.CompanyId = company.Id;
                 job.DatePosted = DateTime.UtcNow;
+
+                // Upload image
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "jobs");
+
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    job.ImageUrl = "/uploads/jobs/" + fileName;
+                }
+
                 _context.Jobs.Add(job);
                 await _context.SaveChangesAsync();
 
                 await _notificationService.NotifyAdminAsync(
                     $"A new job '{job.JobTitle}' has been posted by {company.Name}.",
                     jobId: job.Id,
-                    companyId: company.Id
-                );
+                    companyId: company.Id);
 
-                return RedirectToAction("Index", "company");
+                return RedirectToAction("Create", "JobSkillTest", new { jobId = job.Id });
             }
 
             return View(job);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> CreateJob(Job job)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        job.PostStatus = JobPostStatus.Pending;
-
-        //        // Ensure the job is linked to the logged-in company
-        //        var companyEmail = User.Identity?.Name;
-        //        var company = _context.Companies.FirstOrDefault(c => c.Email == companyEmail);
-        //        if (company == null)
-        //        {
-        //            return RedirectToAction("CompanyRegistration", "Company");
-        //        }
-
-        //        job.CompanyId = company.Id;
-        //        job.DatePosted = DateTime.Now;
-        //        job.IsDeleted = false;
-        //        job.PostStatus = JobPostStatus.Pending;
-
-        //        _context.Jobs.Add(job);
-        //        await _context.SaveChangesAsync();
-        //        var newJobNotification = new Notification
-        //        {
-        //            Message = "A new job has been posted.",
-        //            IsRead = false,
-        //            Date = DateTime.Now,
-        //            Type = NotificationType.NewJob,
-        //            JobId = job.Id,
-        //            JobTitle = job.JobTitle,
-        //            CompanyName = job.Company.Name
-        //        };
-
-        //        _context.Notifications.Add(newJobNotification);
-        //        _context.SaveChanges();
-
-
-
-        //        return RedirectToAction("Index", new { companyId = company.Id });
-        //    }
-        //    return View(job);
-        //}
 
         public IActionResult ViewApplications(int jobId)
         {
@@ -243,7 +149,9 @@ namespace Jobportalwebsite.Controllers
                     a.User.Address,
                     a.Contact,
                     a.Description,
-                    a.DateApplied
+                    a.DateApplied,
+                     a.PerformanceBadge, // Badge based on test score
+                    a.TestScore // Show test score
                 }).ToList();
 
             return View(applications);
@@ -267,27 +175,65 @@ namespace Jobportalwebsite.Controllers
 
             return View(JobsFromDb);
         }
-        //Post
         [HttpPost]
         [ValidateAntiForgeryToken]
-
-        public IActionResult Edit(Job obj)
+        public async Task<IActionResult> Edit(Job obj, IFormFile? imageFile)
         {
+            ValidateSalary(obj);
+
             if (ModelState.IsValid)
             {
                 var jobFromDb = _context.Jobs.AsNoTracking().FirstOrDefault(j => j.Id == obj.Id);
-                if (jobFromDb != null)
+
+                if (jobFromDb == null)
+                    return NotFound();
+
+                obj.CompanyId = jobFromDb.CompanyId;
+
+                if (imageFile != null && imageFile.Length > 0)
                 {
-                    obj.CompanyId = jobFromDb.CompanyId;
-                    _context.Jobs.Update(obj);
-                    _context.SaveChanges();
-                    return RedirectToAction("Index", "Company");
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "jobs");
+
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    obj.ImageUrl = "/uploads/jobs/" + fileName;
                 }
-                return NotFound();
+                else
+                {
+                    obj.ImageUrl = jobFromDb.ImageUrl;
+                }
+
+                _context.Jobs.Update(obj);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Index", "Company");
             }
+
             return View(obj);
         }
-
+        private void ValidateSalary(Job job)
+        {
+            if (job.SalaryPeriod == SalaryPeriod.Negotiable)
+            {
+                job.Salary = null;
+            }
+            else if (!job.Salary.HasValue)
+            {
+                ModelState.AddModelError(nameof(job.Salary), "Salary amount is required unless salary is negotiable.");
+            }
+        }
         //Get
         public IActionResult Delete(int? id)
 
@@ -297,9 +243,6 @@ namespace Jobportalwebsite.Controllers
                 return NotFound();
             }
             var JobsFromDb = _context.Jobs.Find(id);
-            // var JobsFromDbFirst = _context.Jobs.FirstOrDefault(u => u.Id == id);
-            // var JobsFromDbSingle = _context.Jobs. SingleOrDefault(u => u.Id == id);
-
             if (JobsFromDb == null)
             {
                 return NotFound();
@@ -318,13 +261,10 @@ namespace Jobportalwebsite.Controllers
             {
                 return NotFound();
             }
-
             _context.Jobs.Remove(obj);
             _context.SaveChanges();
             return RedirectToAction("Index", "company");
         }
-
-
         [HttpPost]
         public IActionResult Index(string searchString)
         {
@@ -334,288 +274,31 @@ namespace Jobportalwebsite.Controllers
                 return RedirectToAction("Index");
             }
             var filteredJob = _context.Jobs
+                .Include(job => job.Company)
+                .ThenInclude(company => company!.Country)
+                .ThenInclude(country => country!.Currency)
 
                 .AsEnumerable()
                 .Where(p => p.Location.Contains(searchString, StringComparison.OrdinalIgnoreCase)
                 || p.JobTitle.Contains(searchString, StringComparison.OrdinalIgnoreCase)
                 || p.EmploymentType.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-
-
                 .ToList();
-
             return View("Index", filteredJob);
         }
+        public IActionResult Details(int id)
+        {
+            var job = _context.Jobs
+                .Include(j => j.Company)
+                .ThenInclude(company => company!.Country)
+                .ThenInclude(country => country!.Currency)
+                .FirstOrDefault(j => j.Id == id);
 
+            if (job == null)
+            {
+                return NotFound();
+            }
 
+            return View(job);
+        }
     }
-
-
 }
-
-//using Jobportalwebsite.Data;
-//using Jobportalwebsite.Models;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
-//using System.Security.Claims;
-//using Jobportalwebsite.Services;
-
-//namespace Jobportalwebsite.Controllers
-//{
-//    public class JobController : Controller
-//    {
-//        private readonly ApplicationDbContext _context;
-//        private readonly NotificationService _notificationService;
-
-//        public JobController(ApplicationDbContext context, NotificationService notificationService)
-//        {
-//            _context = context;
-//            _notificationService = notificationService;
-//        }
-
-
-
-
-
-
-//        public IActionResult Index()
-//        {
-//            IEnumerable<Job> objJobList = _context.Jobs.Where(x => x.PostStatus == JobPostStatus.Posted);
-//            return View(objJobList);
-//        }
-
-
-
-//        // Admin approves a job
-//        public IActionResult ApproveJob(int id)
-//        {
-//            var job = _context.Jobs.FirstOrDefault(j => j.Id == id);
-//            if (job != null)
-//            {
-//                job.PostStatus = JobPostStatus.Posted; // Change the status to Post (approved)
-//                _context.SaveChanges();
-//            }
-//            return RedirectToAction("Index"); // Redirect to company index or another page
-//        }
-
-
-//        public IActionResult AllJobs()
-//        {
-//            var jobs = _context.Jobs.Where(j => j.PostStatus == JobPostStatus.Posted).ToList();
-//            return View(jobs);
-//        }
-
-//        // GET: Job/Create
-//        [HttpGet]
-//        public IActionResult Create()
-//        {
-//            // Assuming company is linked to the logged-in user
-//            var companyEmail = User.Identity?.Name;
-//            var company = _context.Companies.FirstOrDefault(c => c.Email == companyEmail);
-//            if (company == null)
-//            {
-//                return RedirectToAction("CompanyRegistration", "Company");
-//            }
-
-//            ViewBag.CompanyId = company.Id; // Pass CompanyId to the view
-//            return View();
-//        }
-//        //Post
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public IActionResult xCreates(Job obj)
-//        {
-//            if (ModelState.IsValid)
-//            {
-
-//                _context.Jobs.Add(obj);
-//                _context.SaveChanges();
-
-//                return RedirectToAction("Index");
-//            }
-//            return View(obj);
-//        }
-//        [HttpPost]
-//        public async Task<IActionResult> CreateJob(Job job)
-//        {
-//            if (ModelState.IsValid)
-//            {
-//                job.PostStatus = JobPostStatus.Pending;
-
-//                // Ensure the job is linked to the logged-in company
-//                var companyEmail = User.Identity?.Name;
-//                var company = _context.Companies.FirstOrDefault(c => c.Email == companyEmail);
-//                if (company == null)
-//                {
-//                    return RedirectToAction("CompanyRegistration", "Company");
-//                }
-
-//                job.CompanyId = company.Id;
-//                job.DatePosted = DateTime.Now;
-//                job.IsDeleted = false;
-//                job.PostStatus = JobPostStatus.Pending;
-
-//                _context.Jobs.Add(job);
-//                await _context.SaveChangesAsync();
-
-//                // Send notification to admin
-
-//                await _notificationService.NotifyAdmin("A new job has been posted.", jobId: job.Id);
-
-
-//                return RedirectToAction("Index", new { companyId = company.Id });
-//            }
-//            return View(job);
-//        }
-
-//        //public async Task<IActionResult> CreateJob(Job job)
-//        //{
-//        //    if (ModelState.IsValid)
-//        //    {
-//        //        job.PostStatus = JobPostStatus.Pending;
-//        //        // Ensure the job is linked to the logged-in company
-//        //        var companyEmail = User.Identity?.Name;
-//        //        var company = _context.Companies.FirstOrDefault(c => c.Email == companyEmail);
-//        //        if (company == null)
-//        //        {
-//        //            return RedirectToAction("CompanyRegistration", "Company");
-//        //        }
-
-//        //        job.CompanyId = company.Id;
-//        //        job.DatePosted = DateTime.Now;
-//        //        job.IsDeleted = false;
-//        //        job.PostStatus = JobPostStatus.Pending;
-//        //        _context.Jobs.Add(job);
-//        //        await _context.SaveChangesAsync();
-
-
-
-//        //        return RedirectToAction("Index", new { companyId = company.Id });
-//        //    }
-//        //    return View(job);
-//        //}
-
-//        public IActionResult ViewApplications(int jobId)
-//        {
-//            var applications = _context.Applications
-//                .Include(a => a.User)
-//                .Where(a => a.JobId == jobId)
-//                .Select(a => new
-//                {
-//                    a.User.FirstName,
-//                    a.User.LastName,
-//                    a.User.Email,
-//                    a.User.Address,
-//                    a.Contact,
-//                    a.Description,
-//                    a.DateApplied
-//                }).ToList();
-
-//            return View(applications);
-//        }
-
-//        //Get
-//        public IActionResult Edit(int? id)
-
-//        {
-//            if (id == null || id == 0)
-//            {
-//                return NotFound();
-//            }
-//            var JobsFromDb = _context.Jobs.Find(id);
-
-//            if (JobsFromDb == null)
-//            {
-//                return NotFound();
-//            }
-
-
-//            return View(JobsFromDb);
-//        }
-//        //Post
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-
-//        public IActionResult Edit(Job obj)
-//        {
-//            if (ModelState.IsValid)
-//            {
-//                var jobFromDb = _context.Jobs.AsNoTracking().FirstOrDefault(j => j.Id == obj.Id);
-//                if (jobFromDb != null)
-//                {
-//                    obj.CompanyId = jobFromDb.CompanyId;
-//                    _context.Jobs.Update(obj);
-//                    _context.SaveChanges();
-//                    return RedirectToAction("Index", "Company");
-//                }
-//                return NotFound();
-//            }
-//            return View(obj);
-//        }
-
-//        //Get
-//        public IActionResult Delete(int? id)
-
-//        {
-//            if (id == null || id == 0)
-//            {
-//                return NotFound();
-//            }
-//            var JobsFromDb = _context.Jobs.Find(id);
-//            // var JobsFromDbFirst = _context.Jobs.FirstOrDefault(u => u.Id == id);
-//            // var JobsFromDbSingle = _context.Jobs. SingleOrDefault(u => u.Id == id);
-
-//            if (JobsFromDb == null)
-//            {
-//                return NotFound();
-//            }
-
-
-//            return View(JobsFromDb);
-//        }
-//        //Post
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public IActionResult DeletePOST(int? id)
-//        {
-//            var obj = _context.Jobs.Find(id);
-//            if (obj == null)
-//            {
-//                return NotFound();
-//            }
-
-//            _context.Jobs.Remove(obj);
-//            _context.SaveChanges();
-//            return RedirectToAction("Index");
-//        }
-
-
-//        [HttpPost]
-//        public IActionResult Index(string searchString)
-//        {
-//            if (string.IsNullOrWhiteSpace(searchString))
-//            {
-
-//                return RedirectToAction("Index");
-//            }
-//            var filteredJob = _context.Jobs
-
-//                .AsEnumerable()
-//                .Where(p => p.Location.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-//                || p.JobTitle.Contains(searchString, StringComparison.OrdinalIgnoreCase)
-//                ||p.EmploymentType.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-
-
-//                .ToList();
-
-//            return View("Index", filteredJob);
-//        }
-
-
-//    }
-
-
-//}  
-
-
-
-

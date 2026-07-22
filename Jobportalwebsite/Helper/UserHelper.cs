@@ -3,6 +3,7 @@ using Jobportalwebsite.IHelper;
 using Jobportalwebsite.Models;
 using Jobportalwebsite.Viewmodel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Jobportalwebsite.Helper
 {
@@ -19,143 +20,84 @@ namespace Jobportalwebsite.Helper
             _roleManager = roleManager;
         }
 
-        // Method 1: CreateUserByAsync with default behavior
-        public async Task<ApplicationUser> CreateUserByAsync(RegistrationViewModel model)
+        public async Task<ApplicationUser> CreateUserByAsync(RegistrationViewModel model, string role)
         {
-            if (model != null)
+            if (model == null)
             {
-                var user = new ApplicationUser
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Address = model.Address,
-                    Gender = model.Gender,
-                    DateOfBirth = model.DateOfBirth,
-                    DateCreated = DateTime.Now,
-                    PhoneNumber = model.PhoneNumber,
-                    State = model.State,
-                    Country = model.Country,
-                    Email = model.Email,
-                    UserName = model.Email,
-                    Role = model.Role
-                };
+                return null;
+            }
 
-                var result = await _userManager.CreateAsync(user, model.Password);
-
-                if (result.Succeeded)
+            // Admins don't need a country; Company/Jobseeker do.
+            Country? country = null;
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                country = await GetCountryAsync(model.CountryId);
+                if (country == null)
                 {
-                    await _userManager.AddToRoleAsync(user, model.Role);
-                    return user;
+                    return null;
                 }
             }
 
+            var user = new ApplicationUser
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Address = model.Address,
+                Gender = model.Gender,
+                DateOfBirth = model.DateOfBirth,
+                DateCreated = DateTime.Now,
+                PhoneNumber = model.PhoneNumber,
+                State = model.State,
+                Country = country?.Name,
+                CountryId = country?.Id,
+                Email = model.Email,
+                UserName = model.Email,
+                Role = role
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                if (!await _roleManager.RoleExistsAsync(role))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(role));
+                }
+                await _userManager.AddToRoleAsync(user, role);
+                return user;
+            }
             return null;
         }
 
-        // Method 2: CreateUserByAsync with a specific role
-        public async Task<ApplicationUser> CreateUserByAsync(RegistrationViewModel model, string role)
+        private Task<Country?> GetCountryAsync(int? countryId)
         {
-            if (model != null)
+            return countryId.HasValue
+                ? _context.Countries.SingleOrDefaultAsync(country => country.Id == countryId.Value)
+                : Task.FromResult<Country?>(null);
+        }
+
+        public async Task<List<ApplicationUser>> GetAllOtherUsersAsync(string currentUser)
+        {
+            var users = await _userManager.Users
+                .Where(u => u.UserName != currentUser)
+                .ToListAsync();
+
+            foreach (var user in users)
             {
-                var user = new ApplicationUser
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Address = model.Address,
-                    Gender = model.Gender,
-                    DateOfBirth = model.DateOfBirth,
-                    DateCreated = DateTime.Now,
-                    PhoneNumber = model.PhoneNumber,
-                    State = model.State,
-                    Country = model.Country,
-                    Email = model.Email,
-                    UserName = model.Email,
-                    Role = role
-                };
+                var roles = await _userManager.GetRolesAsync(user);
+                user.Role = roles.FirstOrDefault();
 
-                var result = await _userManager.CreateAsync(user, model.Password);
-
-                if (result.Succeeded)
+                if (user.Role == "Company")
                 {
-                    // Ensure the role exists before adding
-                    if (!await _roleManager.RoleExistsAsync(role))
+                    var company = await _context.Companies.FirstOrDefaultAsync(c => c.Email == user.Email);
+                    if (company != null)
                     {
-                        await _roleManager.CreateAsync(new IdentityRole(role));
+                        user.ProfilePicturePath = company.ProfilePicturePath;
+                        user.FirstName = company.Name;
                     }
-
-                    await _userManager.AddToRoleAsync(user, role);
-                    return user;
                 }
             }
 
-            return null;
+            return users;
         }
     }
 }
-
-
-
-
-
-
-//using Jobportalwebsite.Data;
-//using Jobportalwebsite.IHelper;
-//using Jobportalwebsite.Models;
-//using Jobportalwebsite.Viewmodel;
-//using Microsoft.AspNetCore.Identity;
-//using Microsoft.EntityFrameworkCore;
-
-//namespace Jobportalwebsite.Helper
-//{
-//    public class UserHelper : IUserHelper
-
-//    {
-//        private readonly ApplicationDbContext _context;
-//        private readonly UserManager<ApplicationUser> _userManager;
-//        private readonly SignInManager<ApplicationUser> _signInManager;
-//        private readonly RoleManager<IdentityRole> _roleManager;
-
-//        public UserHelper(ApplicationDbContext context, UserManager<ApplicationUser> userManager,
-//           SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
-//        {
-//            _context = context;
-//            _userManager = userManager;
-//            _signInManager = signInManager;
-//            _roleManager = roleManager;
-//        }
-//        public async Task<ApplicationUser> CreateUserByAsync(RegistrationViewModel applicationUserViewModel)
-
-//        {
-//            if (applicationUserViewModel != null)
-//            {
-//                var user = new ApplicationUser()
-//                {
-
-//                    FirstName = applicationUserViewModel.FirstName,
-//                    LastName = applicationUserViewModel.LastName,
-//                    Address = applicationUserViewModel.Address,
-
-//                    Gender = applicationUserViewModel.Gender,
-//                    DateOfBirth = applicationUserViewModel.DateOfBirth,
-//                    DateCreated = DateTime.Now,
-//                    PhoneNumber = applicationUserViewModel.PhoneNumber,
-//                    State = applicationUserViewModel.State,
-//                    Country = applicationUserViewModel.Country,
-//                    Email = applicationUserViewModel.Email,
-//                    UserName = applicationUserViewModel.Email,
-//                    Role = applicationUserViewModel.Role
-
-
-//                };
-//                var result = await _userManager.CreateAsync(user, applicationUserViewModel.Password);
-//                if (result.Succeeded)
-//                {
-//                    await _userManager.AddToRoleAsync(user, applicationUserViewModel.Role);
-//                    return user;
-//                }
-//            }
-//            return null;
-//        }
-
-//    }
-//}

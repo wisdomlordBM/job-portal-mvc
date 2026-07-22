@@ -31,49 +31,29 @@ namespace Jobportalwebsite.Controllers
             _context = context;
             _environment = environment;
         }
-
-        // GET: Jobseekers
-
-
-
+        //public IActionResult Index()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 
+        //    var UserID = _context.UserRoles
+        //        .Where(ur => ur.RoleId == _context.Roles.FirstOrDefault(r => r.Name == "Jobseeker").Id)
+        //        .Select(ur => ur.UserId);
+
+        //    var user = _context.Users
+        //        .Where(u => userId.Contains(u.Id))
+        //        .ToList();
+
+        //    return View(user);
+        //}
 
         public IActionResult Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // Retrieve users who belong to the "Jobseeker" role
-
-            var UserID = _context.UserRoles
-                .Where(ur => ur.RoleId == _context.Roles.FirstOrDefault(r => r.Name == "Jobseeker").Id)
-                .Select(ur => ur.UserId);
-
-            var user = _context.Users
-                .Where(u => userId.Contains(u.Id))
-                .ToList();
-            // Pass the profile picture path (or default) to the view
-          
+            var user = _context.Users.Where(u => u.Id == userId).ToList();
             return View(user);
         }
 
-        //public IActionResult Index()
-        //{
-        //    // Filter users with the role of "Jobseeker"
-        //    var jobseekers = _context.Users
-        //        .Where(u => u.Role == "Jobseeker") // Adjust "Role" to match your actual property for roles
-        //        .ToList();
-
-        //    return View(jobseekers);
-        //}
-
-        //public IActionResult Index()
-        //{
-        //    var jobseekers = _context.Jobseekers.ToList(); 
-        //    return View(jobseekers); 
-        //}
-
-        // DELETE: Jobseeker
         [HttpPost]
         public IActionResult Delete(int id)
         {
@@ -85,72 +65,51 @@ namespace Jobportalwebsite.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-
-
-
-        //public IActionResult Index()
-        //{
-        //    var jobseekersList = _context.Jobseekers.ToList();
-        //    ViewBag.Message = TempData["SuccessMessage"];
-        //    return View(jobseekersList);
-        //}
+        [HttpGet]
         public IActionResult Create(int jobId)
         {
-          
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            
-            var job = _context.Jobs.Include(j => j.Company).FirstOrDefault(j => j.Id == jobId);
-            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["ErrorMessage"] = "User session expired or unauthorized access.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            var job = _context.Jobs
+                .Include(j => j.Company)
+                .Include(j => j.SkillTests) // Include SkillTests
+                .FirstOrDefault(j => j.Id == jobId);
+
+            var user = _context.Users
+                .FirstOrDefault(u => u.Id == userId);
 
             if (job == null || user == null)
             {
                 TempData["ErrorMessage"] = "You must register as a jobseeker to apply for a job.";
-                return RedirectToAction("Register", "Account"); 
+                return RedirectToAction("Register", "Account");
             }
 
-            var existingApplication = _context.Applications
-                .FirstOrDefault(a => a.JobId == jobId && a.UserId == userId);
+            bool hasApplied = _context.Applications
+                .Any(a => a.JobId == jobId && a.UserId == userId);
 
-            if (existingApplication != null)
+            if (hasApplied)
             {
                 TempData["ErrorMessage"] = "You have already applied for this job.";
-                return RedirectToAction("Index", "Job"); 
+                return RedirectToAction("Index", "Job");
             }
 
             ViewBag.Job = job;
             ViewBag.User = user;
+            ViewBag.SkillTestQuestions = job.SkillTests?.ToList() ?? new List<JobSkillTest>();
 
             return View();
         }
-
-        //public IActionResult Create(int jobId)
-        //{
-        //    // Get the current logged-in user's ID
-        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        //    // Retrieve the job details and user details to populate the application form if necessary
-        //    var job = _context.Jobs.Include(j => j.Company).FirstOrDefault(j => j.Id == jobId);
-        //    var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-
-        //    if (job == null || user == null)
-        //    {
-        //        TempData["ErrorMessage"] = "You must register as a jobseeker to apply for a job.";
-        //        return RedirectToAction("Register", "Account"); // Return 404 if the job or user is not found
-        //    }
-
-        //    // Pass job and user data to the view if you want to pre-populate form fields
-        //    ViewBag.Job = job;
-        //    ViewBag.User = user;
-
-        //    return View();
-        //}
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Application application, int jobId, IFormFile CV)
+        public async Task<IActionResult> Create(Application application, int jobId, IFormFile CV, Dictionary<int, string> SkillTestAnswers)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var existingApplication = _context.Applications
                 .FirstOrDefault(a => a.JobId == jobId && a.UserId == userId);
@@ -160,16 +119,13 @@ namespace Jobportalwebsite.Controllers
                 TempData["ErrorMessage"] = "You cannot apply for the same job more than once.";
                 return RedirectToAction("Index", "Job");
             }
-            if (CV != null && CV.Length > 5 * 1024 * 1024) 
+
+            if (CV != null && CV.Length > 5 * 1024 * 1024)
             {
                 ModelState.AddModelError("CV", "File size exceeds the 5MB limit.");
-                ViewBag.CurrentSection = "jobExperience"; 
+                ViewBag.CurrentSection = "jobExperience";
                 return View(application);
             }
-
-
-
-
 
             var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
             var fileExtension = Path.GetExtension(CV?.FileName).ToLower();
@@ -180,7 +136,10 @@ namespace Jobportalwebsite.Controllers
 
             if (ModelState.IsValid)
             {
-                var job = _context.Jobs.Include(j => j.Company).FirstOrDefault(j => j.Id == jobId);
+                var job = _context.Jobs
+                    .Include(j => j.Company)
+                    .Include(j => j.SkillTests)
+                    .FirstOrDefault(j => j.Id == jobId);
                 if (job == null)
                 {
                     return NotFound();
@@ -207,6 +166,37 @@ namespace Jobportalwebsite.Controllers
                 _context.Applications.Add(myApplication);
                 await _context.SaveChangesAsync();
 
+
+                // Store skill test answers and calculate test score if answers were provided
+                if (SkillTestAnswers != null && SkillTestAnswers.Count > 0)
+                {
+                    foreach (var answer in SkillTestAnswers)
+                    {
+                        var testAnswer = new JobSeekerAnswer
+                        {
+                            ApplicationId = myApplication.Id,
+                            JobSkillTestId = answer.Key,
+                            SelectedAnswer = answer.Value
+                        };
+                        _context.JobSeekerAnswers.Add(testAnswer);
+                    }
+                    await _context.SaveChangesAsync();
+
+                    // Calculate the score and assign badge based on answers
+                    var correctAnswers = job.SkillTests.ToDictionary(q => q.Id, q => q.CorrectAnswer);
+                    int totalQuestions = correctAnswers.Count;
+                    int correctCount = SkillTestAnswers.Count(a => correctAnswers.ContainsKey(a.Key) && correctAnswers[a.Key] == a.Value);
+
+                    int score = (int)((double)correctCount / totalQuestions * 100);
+                    string badge = score >= 80 ? "Success" : (score >= 50 ? "Medium" : "Low");
+
+                   
+                    myApplication.TestScore = score;
+                    myApplication.PerformanceBadge = badge;
+                    _context.Update(myApplication);
+                    await _context.SaveChangesAsync();
+
+                }
                
                 if (CV != null)
                 {
@@ -235,59 +225,6 @@ namespace Jobportalwebsite.Controllers
 
             return View(application);
         }
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create(Application application, int jobId)
-        //{
-        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get the current user's ID
-
-        //    // Check if the user has already applied for the job
-        //    var existingApplication = _context.Applications
-        //        .FirstOrDefault(a => a.JobId == jobId && a.UserId == userId);
-
-        //    if (existingApplication != null)
-        //    {
-        //        TempData["ErrorMessage"] = "You cannot apply for the same job more than once.";
-        //        return RedirectToAction("Index", "Job");
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        var job = _context.Jobs.Include(j => j.Company).FirstOrDefault(j => j.Id == jobId);
-        //        if (job == null)
-        //        {
-        //            return NotFound();
-        //        }
-
-        //        var myApplication = new Application
-        //        {
-        //            JobId = jobId,
-        //            Description = application.Description,
-        //            Contact = application.Contact,
-        //            EducationLevel = application.EducationLevel,
-        //            FieldOfStudy = application.FieldOfStudy,
-        //            SchoolName = application.SchoolName,
-        //            City = application.City,
-        //            State = application.State,
-        //            JobTitle = job.JobTitle,
-        //            CompanyName = job.Company.Name,
-        //            Country = application.Country,
-        //            EmploymentType = application.EmploymentType,
-        //            UserId = userId,
-        //            DateApplied = DateTime.Now
-        //        };
-
-        //        _context.Applications.Add(myApplication);
-        //        await _context.SaveChangesAsync();
-
-        //        TempData["SuccessMessage"] = "Application submitted successfully! Please upload your CV.";
-        //        return RedirectToAction("UploadCV", new { applicationId = myApplication.Id });
-        //    }
-
-        //    return View(application);
-        //}
-
         [HttpGet]
         public IActionResult UploadCV(int applicationId)
         {
@@ -338,26 +275,6 @@ namespace Jobportalwebsite.Controllers
             TempData["SuccessMessage"] = "CV uploaded successfully!";
             return RedirectToAction("Index", "Job");
         }
-
-        //[HttpGet]
-        //public IActionResult UploadCV(int applicationId)
-        //{
-        //    var application = _context.Applications.FirstOrDefault(a => a.Id == applicationId);
-
-        //    if (application == null || application.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(new UploadCVViewModel { ApplicationId = applicationId });
-        //}
-
-
-
-
-
-
-
         [HttpGet]
         public IActionResult Edit(string id)
         {
@@ -367,73 +284,65 @@ namespace Jobportalwebsite.Controllers
                 return NotFound();
             }
 
+            ViewBag.Countries = _context.Countries.OrderBy(c => c.Name).ToList();
             return View(user);
         }
-
-
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ApplicationUser model, IFormFile? profilePicture)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // Retrieve the user from the database
-                var user = await _context.Users.FindAsync(model.Id);
-                if (user == null)
-                {
-                    return NotFound();
-                }
-
-                // Update user details
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
-                user.Address = model.Address;
-                user.PhoneNumber = model.PhoneNumber;
-                user.Country = model.Country;
-
-                // Handle profile picture upload
-                if (profilePicture != null && profilePicture.Length > 0)
-                {
-                    var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
-                    Directory.CreateDirectory(uploadsFolder);
-
-                    var fileName = Guid.NewGuid() + Path.GetExtension(profilePicture.FileName);
-                    var filePath = Path.Combine(uploadsFolder, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await profilePicture.CopyToAsync(stream);
-                    }
-
-                    user.ProfilePicturePath = "/uploads/" + fileName;
-                }
-
-                // Save changes to the database
-                _context.Users.Update(user);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("Details", new { id = user.Id });
+                ViewBag.Countries = _context.Countries.OrderBy(c => c.Name).ToList();
+                return View(model);
             }
 
-            return View(model);
+            var user = await _context.Users.FindAsync(model.Id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Address = model.Address;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Gender = model.Gender;
+            user.DateOfBirth = model.DateOfBirth;
+
+            if (model.CountryId.HasValue)
+            {
+                var country = _context.Countries.FirstOrDefault(c => c.Id == model.CountryId.Value);
+                if (country != null)
+                {
+                    user.CountryId = country.Id;
+                    user.Country = country.Name;
+                }
+            }
+
+            if (profilePicture != null && profilePicture.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = Guid.NewGuid() + Path.GetExtension(profilePicture.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await profilePicture.CopyToAsync(stream);
+                }
+
+                user.ProfilePicturePath = "/uploads/" + fileName;
+            }
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Profile updated successfully!";
+            return RedirectToAction("Details", new { email = user.Email });
         }
-
-
-
-        //[HttpGet]
-        //public IActionResult Delete(int id)
-        //{
-        //    var jobseeker = _context.Jobseekers.Find(id);
-        //    if (jobseeker == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(jobseeker);
-        //}
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
@@ -469,47 +378,6 @@ namespace Jobportalwebsite.Controllers
 
             return View(user);
         }
-
-
-
-        //[Route("Jobseekers/Details/{email}")]
-        //public IActionResult Details(string email)
-        //{
-        //    if (string.IsNullOrEmpty(email))
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    var user = _context.Users.FirstOrDefault(u => u.Email == email);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(user);
-        //}
-
-
-
-        ////public IActionResult Details()
-        ////{
-        ////    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        ////    if (userId == null)
-        ////    {
-        ////        return Unauthorized();
-        ////    }
-
-        ////    var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-        ////    if (user == null)
-        ////    {
-        ////        return NotFound();
-        ////    }
-
-        ////    return View(user);
-        ////}
-
-
         public IActionResult Detailsaaa(int id)
         {
             var jobseeker = _context.Jobseekers.Find(id);

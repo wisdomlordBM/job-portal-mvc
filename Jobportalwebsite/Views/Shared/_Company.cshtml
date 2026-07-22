@@ -40,7 +40,13 @@
                         <li class="nav-item">
                             <a class="nav-link " asp-area="" asp-controller="Company" asp-action="Index">Company</a>
                         </li>
+                        <li class="nav-item">
 
+                            <!-- Add to the navbar or wherever you want the chat icon -->
+                            <a href="@Url.Action("Index", "Chat")" class="btn btn-primary">
+                                <i class="bi bi-chat"></i> Chat
+                            </a>
+                        </li>
                     </ul>
 
                     <ul class="navbar-nav ms-auto">
@@ -50,12 +56,6 @@
                                 <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
                             </li>
 
-                            @* <li class="nav-item">
-                                <a class="nav-link" href="javascript:void(0);" onclick="document.getElementById('logoutForm').submit();">Logout</a>
-                            </li>
-                            <form id="logoutForm" asp-controller="Account" asp-action="Logout" method="post" style="display: none;">
-                                @Html.AntiForgeryToken()
-                            </form> *@
 
 
                             <li class="nav-item">
@@ -93,31 +93,7 @@
                 </div>
             </div>
         </nav>
-       @* <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Jobportalwebsite</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between" id="navbarNav">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                 
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            
-                        </li>
-                    </ul>
-
-                   
-                   
-                </div>
-            </div>
-        </nav>*@
+       
     </header>
 
     <div class="container-fluid">
@@ -190,26 +166,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-  @*   <!-- Fetch notifications count and list using AJAX -->
-    <script>
-        $(document).ready(function () {
-            // Fetch notification count
-            $.get('/Notifications/GetNotificationCount', function (data) {
-                $('#notificationCount').text(data);
-            });
 
-            // Fetch notification list when modal is opened
-            $('#notificationsModal').on('show.bs.modal', function () {
-                $.get('/Notifications/GetNotifications', function (notifications) {
-                    let notificationList = $('#notificationList');
-                    notificationList.empty();
-                    notifications.forEach(function (notification) {
-                        notificationList.append('<li class="list-group-item">' + notification.message + '</li>');
-                    });
-                });
-            });
-        });
-    </script> *@
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

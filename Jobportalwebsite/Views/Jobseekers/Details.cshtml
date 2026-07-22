@@ -4,70 +4,98 @@
     Layout = isOwnProfile ? "~/Views/Shared/_Jobseekers.cshtml" : "~/Views/Shared/_Layout.cshtml";
 }
 
+<style>
+    .profile-hero {
+        background: linear-gradient(135deg, #12bcaa, #0d8f80);
+        border-radius: 16px;
+        padding: 40px 30px 60px;
+        color: #fff;
+        text-align: center;
+        position: relative;
+        margin-bottom: 60px;
+    }
 
-<div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f8f9fa;">
-    <div style="border-radius: 20px; background: #ffffff; padding: 30px; max-width: 600px; width: 100%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
-        <h2 style="text-align: center; color: #007bff; font-weight: bold;">My Personal Details</h2>
-        <h4 style="text-align: center; margin-bottom: 20px;">My Profile</h4>
-        <hr style="border-top: 2px solid #007bff;" />
-        <div style="text-align: center;">
-            <img src="@Model.ProfilePicturePath" alt="Profile Picture" class="img-thumbnail"
-                 style="width: 150px; height: 150px; margin-bottom: 15px; border-radius: 50%; object-fit: cover;" />
+        .profile-hero img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            position: absolute;
+            left: 50%;
+            bottom: -50px;
+            transform: translateX(-50%);
+            background: #fff;
+        }
+
+    .info-card {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .info-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #6c757d;
+    }
+</style>
+
+<div class="container mt-4" style="max-width: 700px;">
+
+    @if (isOwnProfile && !Model.IsProfileComplete())
+    {
+        <div class="alert alert-warning d-flex justify-content-between align-items-center mb-4">
+            <span><i class="bi bi-exclamation-circle"></i> Your profile is incomplete. Complete it to improve your chances with employers.</span>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-warning">Complete Profile</a>
         </div>
+    }
 
-        <dl style="display: grid; grid-template-columns: 1fr 2fr; row-gap: 10px; column-gap: 20px;">
-            <dt style="font-weight: bold;">Name:</dt>
-            <dd>@Model.FirstName @Model.LastName</dd>
-
-            <dt style="font-weight: bold;">Email:</dt>
-            <dd>@Model.Email</dd>
-
-            <dt style="font-weight: bold;">Location:</dt>
-            <dd>@Model.Address</dd>
-
-            <dt style="font-weight: bold;">Contact:</dt>
-            <dd>@Model.PhoneNumber</dd>
-
-            <dt style="font-weight: bold;">Country:</dt>
-            <dd>@Model.Country</dd>
-        </dl>
-        <a href="javascript:history.back()" class="btn btn-outline-secondary mt-3">
-            <i class="bi bi-arrow-left-circle"></i> Back
-        </a>
+    <div class="profile-hero">
+        <h2 class="mb-1">@Model.FirstName @Model.LastName</h2>
+        <p class="mb-0" style="opacity: 0.9;">@Model.Email</p>
+        <img src="@(string.IsNullOrEmpty(Model.ProfilePicturePath) ? "/images/anonymous.png" : Model.ProfilePicturePath)" alt="Profile Picture" />
     </div>
+
+    <div class="card info-card p-4 mb-4">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="info-label">Contact</div>
+                <div>@(Model.PhoneNumber ?? "Not set")</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">Address</div>
+                <div>@(Model.Address ?? "Not set")</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">Country</div>
+                <div>@(Model.Country ?? "Not set")</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">Gender</div>
+                <div>@(Model.Gender ?? "Not set")</div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-label">Date of Birth</div>
+                <div>@(Model.DateOfBirth ?? "Not set")</div>
+            </div>
+        </div>
+    </div>
+
+    @if (isOwnProfile)
+    {
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                <i class="bi bi-pencil-square"></i> Edit Profile
+            </a>
+            <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-outline-secondary">
+                <i class="bi bi-key"></i> Change Password
+            </a>
+        </div>
+    }
+
+    <a asp-controller="Job" asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left-circle"></i> Back to Jobs
+    </a>
 </div>
-
-
-
-
-@* @model Jobportalwebsite.Models.Jobseekers
-    
-<h2>Job Seeker Details</h2>
-
-<div>
-    <h4>Job Seeker Profile</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Name</dt>
-        <dd class="col-sm-10">@Model.Name</dd>
-
-        <dt class="col-sm-2">Email</dt>
-        <dd class="col-sm-10">@Model.Email</dd>
-
-        <dt class="col-sm-2">Location</dt>
-        <dd class="col-sm-10">@Model.Location</dd>
-
-        <dt class="col-sm-2">Contact</dt>
-        <dd class="col-sm-10">@Model.Contact</dd>
-
-        <dt class="col-sm-2">Description</dt>
-        <dd class="col-sm-10">@Model.Description</dd>
-    </dl>
-</div> *@
-
-@* <div>
-    <a asp-controller="Jobs" asp-action="Index" class="btn btn-primary">Back</a>
-</div> *@
-
-
-

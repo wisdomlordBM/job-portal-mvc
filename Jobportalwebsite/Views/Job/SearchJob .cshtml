@@ -26,7 +26,7 @@ else{
                         <p class="card-text text-truncate">@job.Description</p>
                         <p><strong>Location:</strong> @job.Location</p>
                         <p><strong>Employment Type:</strong> @job.EmploymentType</p>
-                        <p><strong>Salary:</strong> @job.Salary.ToString("C2", new System.Globalization.CultureInfo("ig-NG"))</p>
+                        <p><strong>Salary:</strong> @Jobportalwebsite.Helper.SalaryFormatter.Format(job.Salary, job.Company?.Country?.Currency?.Symbol, job.SalaryPeriod)</p>
                         <div class="d-flex justify-content-center">
                             <a asp-controller="Jobseekers" asp-action="Create" asp-route-jobId="@job.Id" class="btn btn-outline-success">Apply</a>
                         </div>

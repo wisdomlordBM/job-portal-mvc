@@ -15,28 +15,10 @@
 }
 else
 {
-
-    <div class="row">
-        @foreach (var job in Model)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm h-100" style="border-radius: 15px;">
-                    <img src="~/@job.ImageUrl" alt="Job Image" class="card-img-top" style="height: 150px; object-fit: cover;">
-
-                    <div class="card-body">
-                        <h5 class="card-title">@job.JobTitle</h5>
-                        <p class="card-text text-truncate">@job.Description</p>
-                        <p><strong>Location:</strong> @job.Location</p>
-                        <p><strong>Employment Type:</strong> @job.EmploymentType</p>
-                        <p><strong>Salary:</strong> @job.Salary.ToString("C2", new System.Globalization.CultureInfo("ig-NG"))</p>
-                        <div class="d-flex justify-content-center">
-                            <a asp-controller="Jobseekers" asp-action="Create" asp-route-jobId="@job.Id" class="btn btn-outline-success">Apply</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
+    @foreach (var job in Model)
+    {
+        <partial name="_JobListingRow" model="job" />
+    }
 }
 
 

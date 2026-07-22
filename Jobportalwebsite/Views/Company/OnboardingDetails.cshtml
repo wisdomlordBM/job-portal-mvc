@@ -1,0 +1,41 @@
+﻿@model Jobportalwebsite.Models.Company
+@{
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height:100vh; padding-top:50px;">
+    <div class="card shadow-lg" style="width:40rem; border-radius:20px;">
+        <div class="card-body p-5">
+            <partial name="_OnboardingSteps" model="Jobportalwebsite.Models.CompanyOnboardingStep.Details" />
+
+            <h2 class="card-title text-center mb-4">Company Details</h2>
+
+            <form asp-action="OnboardingDetails" asp-route-id="@Model.Id" method="post">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Company Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter your company name" required />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Industry" class="form-label fw-bold">Industry</label>
+                    <input asp-for="Industry" class="form-control" placeholder="e.g. Technology, Healthcare" required />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold">Company Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Phone" class="form-label fw-bold">Phone</label>
+                    <input asp-for="Phone" class="form-control" placeholder="Enter a contact phone number" />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="WebsiteUrl" class="form-label fw-bold">Website URL</label>
+                    <input asp-for="WebsiteUrl" type="url" class="form-control" placeholder="https://yourcompany.com" />
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Continue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -12,8 +12,10 @@
             {
                 <div class="col-md-4 mb-4">
                     <div class="card shadow-sm h-100" style="border-radius: 15px;">
-                        <img src="~/@job.ImageUrl" alt="Job Image" class="card-img-top" style="height: 150px; object-fit: cover;">
-
+                        <img src="@job.ImageUrl"
+                             alt="Job Image"
+                             class="card-img-top"
+                             style="height:150px;object-fit:cover;" />
 
                         <div class="card-body">
                             <h5 class="card-title">@job.JobTitle</h5>
@@ -34,7 +36,7 @@
                             <p class="mb-2"><strong>Location:</strong> @job.Location</p>
                             <p class="mb-2"><strong>Employment Type:</strong> @job.EmploymentType</p>
                             <p class="mb-2">
-                                <strong>Salary:</strong> @string.Format(new System.Globalization.CultureInfo("en-NG"), "{0:C2}", job.Salary)
+                                <strong>Salary:</strong> @Jobportalwebsite.Helper.SalaryFormatter.Format(job.Salary, job.CurrencySymbol, job.SalaryPeriod)
                             </p>
                             <p class="mb-2">
                                 <strong>Status:</strong>
