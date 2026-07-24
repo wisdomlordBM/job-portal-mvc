@@ -23,17 +23,16 @@ namespace Jobportalwebsite.Models
         public DateTime DatePosted { get; set; } = DateTime.Now;
         public JobPostStatus PostStatus { get; set; } = JobPostStatus.Pending;
         public virtual ICollection<JobSkillTest> SkillTests { get; set; } = new List<JobSkillTest>();
-
-        public string? ImageUrl { get; set; } 
+        public string? ImageUrl { get; set; }
+        [NotMapped]
+        public int ApplicantCount { get; set; }
     }
-
     public enum JobPostStatus
     {
         Pending = 1,
         Posted = 2,
         Declined  = 3,
     }
-
     public enum SalaryPeriod
     {
         PerHour = 1,
@@ -45,8 +44,3 @@ namespace Jobportalwebsite.Models
         Negotiable = 7
     }
 }
-
-
-
-
-

@@ -35,9 +35,11 @@
             </div>
 
             <p class="job-row-description mt-2 mb-2">@snippet</p>
-
             <div class="d-flex align-items-center gap-2">
                 <span class="badge job-badge">@Model.EmploymentType</span>
+                <span class="badge job-badge">
+                    <i class="bi bi-people"></i> @Model.ApplicantCount applicant@(Model.ApplicantCount == 1 ? "" : "s")
+                </span>
                 <a asp-controller="Job" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-success ms-auto">
                     View Details
                 </a>

@@ -1,6 +1,4 @@
-﻿
-
-@model List<Jobportalwebsite.ViewModel.ChatMessageViewModel>
+﻿@model List<Jobportalwebsite.ViewModel.ChatMessageViewModel>
 @{
     var receiver = Model.FirstOrDefault(m => !m.IsCurrentUser);
     var receiverName = receiver?.SenderUserName ?? "User";

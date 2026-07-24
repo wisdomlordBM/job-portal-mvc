@@ -10,43 +10,31 @@ using Jobportalwebsite.Migrations;
 using Microsoft.AspNetCore.Authorization;
 using System.IO;
 using System.Linq;
-
 using System;
+using Jobportalwebsite.Services;
 using System.Threading.Tasks;
 using UploadCVViewModel = Jobportalwebsite.Models.UploadCVViewModel;
 using Microsoft.Extensions.Hosting;
-
-
-
-
 namespace Jobportalwebsite.Controllers
 {
     public class JobseekersController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly NotificationService _notificationService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public JobseekersController(ApplicationDbContext context, IWebHostEnvironment environment)
+        public JobseekersController(
+            ApplicationDbContext context,
+            IWebHostEnvironment environment,
+            NotificationService notificationService,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _environment = environment;
+            _notificationService = notificationService;
+            _userManager = userManager;
         }
-        //public IActionResult Index()
-        //{
-        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-
-        //    var UserID = _context.UserRoles
-        //        .Where(ur => ur.RoleId == _context.Roles.FirstOrDefault(r => r.Name == "Jobseeker").Id)
-        //        .Select(ur => ur.UserId);
-
-        //    var user = _context.Users
-        //        .Where(u => userId.Contains(u.Id))
-        //        .ToList();
-
-        //    return View(user);
-        //}
-
         public IActionResult Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -60,8 +48,8 @@ namespace Jobportalwebsite.Controllers
             var jobseeker = _context.Jobseekers.Find(id);
             if (jobseeker != null)
             {
-                _context.Jobseekers.Remove(jobseeker); 
-                _context.SaveChanges(); 
+                _context.Jobseekers.Remove(jobseeker);
+                _context.SaveChanges();
             }
             return RedirectToAction(nameof(Index));
         }
@@ -166,6 +154,24 @@ namespace Jobportalwebsite.Controllers
                 _context.Applications.Add(myApplication);
                 await _context.SaveChangesAsync();
 
+                // Notify the company that a new applicant has applied
+                if (job.Company != null && !string.IsNullOrEmpty(job.Company.Email))
+                {
+                    var companyUser = await _userManager.FindByEmailAsync(job.Company.Email);
+                    if (companyUser != null)
+                    {
+                        var applicant = await _userManager.FindByIdAsync(userId);
+                        var applicantName = applicant != null
+                            ? $"{applicant.FirstName} {applicant.LastName}".Trim()
+                            : string.Empty;
+
+                        var message = string.IsNullOrWhiteSpace(applicantName)
+                            ? $"A candidate applied for '{job.JobTitle}'."
+                            : $"{applicantName} applied for '{job.JobTitle}'.";
+
+                        await _notificationService.NotifyUserAsync(companyUser.Id, message);
+                    }
+                }
 
                 // Store skill test answers and calculate test score if answers were provided
                 if (SkillTestAnswers != null && SkillTestAnswers.Count > 0)
@@ -190,14 +196,14 @@ namespace Jobportalwebsite.Controllers
                     int score = (int)((double)correctCount / totalQuestions * 100);
                     string badge = score >= 80 ? "Success" : (score >= 50 ? "Medium" : "Low");
 
-                   
+
                     myApplication.TestScore = score;
                     myApplication.PerformanceBadge = badge;
                     _context.Update(myApplication);
                     await _context.SaveChangesAsync();
 
                 }
-               
+
                 if (CV != null)
                 {
                     var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "cvs");
@@ -371,7 +377,7 @@ namespace Jobportalwebsite.Controllers
                 return NotFound();
             }
 
-            var currentUserEmail = User.Identity?.Name; 
+            var currentUserEmail = User.Identity?.Name;
             bool isOwnProfile = string.Equals(currentUserEmail, user.Email, StringComparison.OrdinalIgnoreCase);
 
             ViewBag.IsOwnProfile = isOwnProfile;
@@ -389,4 +395,3 @@ namespace Jobportalwebsite.Controllers
         }
     }
 }
-
