@@ -198,7 +198,7 @@ namespace Jobportalwebsite.Controllers
                     _context.JobSeekerAnswers.RemoveRange(application.JobSeekerAnswers);
                 }
 
-                _context.Applications.Remove(application);
+                _context.Applications.Remove(application); 
                 await _context.SaveChangesAsync();
 
                 TempData["Message"] = "User has been notified of the decline.";

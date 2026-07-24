@@ -25,6 +25,9 @@
                         @Jobportalwebsite.Helper.SalaryFormatter.Format(Model.Salary, Model.Company?.Country?.Currency?.Symbol, Model.SalaryPeriod)
                     </span>
                     <span class="badge job-badge">Posted @Model.DatePosted.ToString("MMM dd, yyyy")</span>
+                    <span class="badge job-badge">
+                        <i class="bi bi-people"></i> @Model.ApplicantCount applicant@(Model.ApplicantCount == 1 ? "" : "s")
+                    </span>
                 </div>
             </div>
         </div>

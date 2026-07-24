@@ -170,104 +170,74 @@
 </div>
 <div class="container my-5">
     <h2 class="text-center text-primary mb-4">Discover Your Next Career Opportunity</h2>
-    <div id="jobCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
-        <div class="carousel-inner">
-            @if (Model != null && Model.Count > 0)
-            {
-                var jobCount = Model.Count;
-                var slides = (int)Math.Ceiling((double)jobCount / 3);  // Calculate the number of slides
 
-                for (var slideIndex = 0; slideIndex < slides; slideIndex++)
+    @if (Model != null && Model.Count > 0)
+    {
+        <div id="jobCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+            <div class="carousel-inner">
+                @for (int i = 0; i < Model.Count; i++)
                 {
-                    var jobsInSlide = Model.Skip(slideIndex * 3).Take(3);  // Take 3 jobs per slide
-                    <div class="carousel-item @(slideIndex == 0 ? "active" : "")">
-                        <div class="row">
-                            @foreach (var job in jobsInSlide)
-                            {
-                                <div class="col-md-4 mb-4 job-card">
-                                    <div class="card shadow-sm h-100" style="border-radius: 15px;">
-                                        <img src="~/@job.ImageUrl" alt="Job Image" class="card-img-top" style="height: 150px; object-fit: cover;">
-                                        <div class="card-body">
-                                            <h5 class="card-title"><strong>Job Title:</strong> <span class="job-title">@job.JobTitle</span></h5>
-                                            <p>
-                                                <strong>Description:</strong>
-                                                @if (job.Description.Length > 100)
-                                                {
-                                                    @job.Description.Substring(0, 100)
-                                                    <a href="#" class="btn btn-link text-primary" data-bs-toggle="modal" data-bs-target="#jobDescriptionModal" data-description="@job.Description" style="text-decoration: none;">Read More</a>
-                                                }
-                                                else
-                                                {
-                                                    @job.Description
-                                                }
-                                            </p>
-                                            <p><strong>Location:</strong> <span class="job-location">@job.Location</span></p>
-                                            <p><strong>Employment Type:</strong> <span class="job-employment">@job.EmploymentType</span></p>
-                                            <p><strong>Salary:</strong> @Jobportalwebsite.Helper.SalaryFormatter.Format(job.Salary, job.Company?.Country?.Currency?.Symbol, job.SalaryPeriod)</p>
-                                            <p><strong>Date Posted:</strong> <span class="job-date">@job.DatePosted.ToString("MMMM dd, yyyy")</span></p>
-                                            <div class="d-flex justify-content-center">
-                                                <a asp-controller="Jobseekers" asp-action="Create" asp-route-jobId="@job.Id" class="btn btn-outline-success">Apply</a>
-                                            </div>
+                    var job = Model[i];
+                    var logoPath = string.IsNullOrEmpty(job.Company?.ProfilePicturePath)
+                    ? "/images/default-company-logo.png"
+                    : job.Company.ProfilePicturePath;
+
+                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                        <div class="d-flex justify-content-center">
+                            <div class="card shadow-sm rounded-4" style="max-width: 650px; width: 100%;">
+                                <div class="card-body d-flex gap-3">
+                                    <img src="@logoPath" alt="@job.Company?.Name" style="width:64px;height:64px;object-fit:cover;border-radius:10px;flex-shrink:0;" />
+                                    <div class="flex-grow-1">
+                                        <h5 class="mb-1">@job.JobTitle</h5>
+                                        <div class="text-muted small mb-2">
+                                            @job.Company?.Name
+                                            @if (!string.IsNullOrEmpty(job.Location))
+                                            {
+                                                <span> · @job.Location</span>
+                                            }
                                         </div>
+                                        <p class="mb-2" style="font-size: 0.92rem; color: #4a4a4a;">
+                                            @{
+                                                var desc = job.Description ?? string.Empty;
+                                                var snippet = desc.Length > 140 ? desc.Substring(0, 140) + "…" : desc;
+                                            }
+                                            @snippet
+                                        </p>
+                                        <div class="d-flex flex-wrap gap-2 mb-3">
+                                            <span class="badge" style="background:#eef2f5;color:#495057;">@job.EmploymentType</span>
+                                            <span class="badge" style="background:#eef2f5;color:#495057;">
+                                                @Jobportalwebsite.Helper.SalaryFormatter.Format(job.Salary, job.Company?.Country?.Currency?.Symbol, job.SalaryPeriod)
+                                            </span>
+                                        </div>
+                                        <a asp-controller="Job" asp-action="Details" asp-route-id="@job.Id" class="btn btn-outline-success btn-sm">
+                                            View Details
+                                        </a>
                                     </div>
                                 </div>
-                            }
+                            </div>
                         </div>
                     </div>
                 }
-            }
-            else
+            </div>
+
+            @if (Model.Count > 1)
             {
-                <p>No jobs available at the moment.</p>
+                <button class="carousel-control-prev" type="button" data-bs-target="#jobCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#jobCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
             }
         </div>
-
-        <!-- Custom carousel controls -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#jobCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#jobCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
-    </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">No jobs available at the moment.</p>
+    }
 </div>
-
-
-
-
-
-<!-- Modal -->
-<div class="modal fade" id="jobDescriptionModal" tabindex="-1" aria-labelledby="jobDescriptionModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="jobDescriptionModalLabel">Job Description</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p id="modalJobDescription"></p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Handle modal description population
-    const jobDescriptionModal = document.getElementById('jobDescriptionModal');
-    jobDescriptionModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget; // Button that triggered the modal
-        const description = button.getAttribute('data-description'); // Extract description
-        const modalBody = document.getElementById('modalJobDescription');
-        modalBody.textContent = description;
-    });
-</script>
-
-
-
-
-
 <div class="container-fluid p-5 bg-light my-5">
     <div class="row">
         <div class="col-md-6">

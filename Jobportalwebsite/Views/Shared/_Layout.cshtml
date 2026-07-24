@@ -1,32 +1,11 @@
-﻿@* <!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Jobportalwebsite</title>
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/bootstrap (4).css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Jobportalwebsite.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head> *@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Jobportalwebsite</title>
-
-    <!-- Link to CSS -->
-    
+    <title>@ViewData["Title"] CareerNest</title>
+    <link rel="icon" type="image/jpeg" href="~/images/icon1.png" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    
-
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/bootstrap (4).css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -34,10 +13,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Add CSS for Loading Screen -->
     <style>
-        /* Full-screen loading overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -76,18 +52,14 @@
     <header>
         <nav class="navbar navbar-expand-lg" style="background-color: #12bcaa;" data-bs-theme="dark">
             <div class="container-fluid">
-                <!-- Logo -->
                 <img src="~/images/icon1.jpg" alt="Logo" width="70" height="50" style="border-radius: 50%;">
-                <a class="navbar-brand" href="#">DreamJob</a>
+                <a class="navbar-brand" href="#">CareerNest</a>
 
-                <!-- Mobile Toggle Button -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <!-- Navbar Links -->
                 <div class="collapse navbar-collapse" id="navbarColor01">
-                    <!-- Left-aligned Links -->
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
@@ -97,7 +69,6 @@
                         </li>
                     </ul>
 
-                    <!-- Right-aligned Links -->
                     <ul class="navbar-nav ms-auto">
                         @if (User.Identity.IsAuthenticated)
                         {
@@ -105,7 +76,6 @@
                                 <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
                             </li>
                             <li class="nav-item">
-                                @* Map user roles to their respective dashboards *@
                                 @{
                                     var roleToUrlMapping = new Dictionary<string, string>
                             {
@@ -138,132 +108,45 @@
             </div>
         </nav>
     </header>
-
-   
-@*     <header>
-        
-
-        <nav class="navbar navbar-expand-lg" style="background-color: #12bcaa;" data-bs-theme="dark">
-
-            <div class="container-fluid">
-                <img src="~/images/icon1.jpg" alt="Bootstrap" width="70" height="50" style="border-radius:50%;">
-                <a class="navbar-brand" href="#"></a>
-                
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="true" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse show" id="navbarColor01" style="">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            
-                                <a class="nav-link " asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                                <span class="visually-hidden">(current)</span>
-                            
-                        </li>
-
-                    </ul>
-                    <ul class="navbar-nav ms-auto">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
-                            </li>
-
-                          
-
-                          
-                            <li class="nav-item">
-                                @{
-                                    var roleToUrlMapping = new Dictionary<string, string>
-                            {
-                            { "Admin", Url.Action("Index", "Admin") },
-                            { "Jobseeker", Url.Action("Index", "Job") },
-                            { "Company", Url.Action("Index", "Company") }
-                            };
-
-                                    var userRole = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
-                                    var dashboardUrl = roleToUrlMapping.ContainsKey(userRole ?? string.Empty)
-                                    ? roleToUrlMapping[userRole]
-                                    : Url.Action("Index", "Home");
-                                }
-                                <a class="nav-link" href="@dashboardUrl">Dashboard</a>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="CompanyRegister">CreateCompany</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
-                            </li>
-                        }
-                    </ul>
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-
-                        
-                            <a class="nav-link" href="@Url.Action("Index", "Blog")">Blog</a>
-                        
-                        <span class="visually-hidden">(current)</span>
-
-                        </li>
-
-                    </ul>
-                </div>
-            </div>
-        </nav>
-   
-    </header> *@
-
     <div class="container-fluid">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
-    <footer class= footer text-muted bg-dark">
-        <footer class="bg-dark text-white py-2">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-4">
-                        <h5>About OnyeJob</h5>
-                        <p style="font-size: 14px;">Your trusted platform for job opportunities and career advancement. Join millions of job seekers and employers today.</p>
-                        <p style="font-size: 14px;">Email: ilohonyebuchibm@gmail.com</p>
-                        <p style="font-size: 14px;">Phone: +234-8122-614-454</p>
-                    </div>
-
-                    <div class="col-md-4 footer-links">
-                        <h5>Quick Links</h5>
-                        <ul class="list-unstyled" style="font-size: 14px;">
-                            <li><a href="/about">About Us</a></li>
-                            <li><a href="/contact">Contact</a></li>
-                            <li><a href="/jobs">Browse Jobs</a></li>
-                            <li><a href="/employer/register">Post a Job</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4">
-                        <h5>Stay Connected</h5>
-                        <p style="font-size: 14px;">Follow us on social media for updates and job tips.</p>
-                        <a href="#" class="text-white"><i class="fab fa-facebook-f me-3"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-twitter me-3"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
+    <footer class="footer text-muted bg-dark">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-white">About CareerNest</h5>
+                    <p style="font-size: 14px;" class="text-white-50">Your trusted platform for job opportunities and career advancement. Join a growing community of job seekers and employers today.</p>
+                    <p style="font-size: 14px;" class="text-white-50">Email: support@careernest.com</p>
+                    <p style="font-size: 14px;" class="text-white-50">Phone: +1-555-0100</p>
                 </div>
-                <hr>
-                <p class="text-center" style="font-size: 14px;">&copy; 2024 OnyeJob. All Rights Reserved.</p>
-            </div>
-        </footer>
 
-        <div class="container">
-            &copy; 2024 - Jobportalwebsite - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                <div class="col-md-4 footer-links">
+                    <h5 class="text-white">Quick Links</h5>
+                    <ul class="list-unstyled" style="font-size: 14px;">
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/jobs">Browse Jobs</a></li>
+                        <li><a href="/employer/register">Post a Job</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white">Stay Connected</h5>
+                    <p style="font-size: 14px;" class="text-white-50">Follow us on social media for updates and job tips.</p>
+                    <a href="#" class="text-white"><i class="fab fa-facebook-f me-3"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-twitter me-3"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <p class="text-center text-white-50" style="font-size: 14px;">&copy; @DateTime.Now.Year CareerNest. All Rights Reserved.</p>
+            <p class="text-center" style="font-size: 14px;">
+                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-white-50">Privacy</a>
+            </p>
         </div>
     </footer>
-
-    <!-- Notifications Modal -->
     <div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -275,7 +158,6 @@
                 </div>
                 <div class="modal-body">
                     <ul id="notificationList" class="list-group">
-                        <!-- Notifications will be loaded here -->
                     </ul>
                 </div>
             </div>
@@ -290,47 +172,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
-    <!-- Fetch notifications count and list using AJAX -->
     <script>
         $(document).ready(function () {
-            // Fetch notification count
-            $.get('/Notifications/GetNotificationCount', function (data) {
+            $.get('/Notification/GetMyNotificationCount', function (data) {
                 $('#notificationCount').text(data);
             });
-
-            // Fetch notification list when modal is opened
             $('#notificationsModal').on('show.bs.modal', function () {
-                $.get('/Notifications/GetNotifications', function (notifications) {
+                $.get('/Notification/GetMyNotifications', function (notifications) {
                     let notificationList = $('#notificationList');
                     notificationList.empty();
-                    notifications.forEach(function (notification) {
-                        notificationList.append('<li class="list-group-item">' + notification.message + '</li>');
-                    });
+                    if (notifications.length === 0) {
+                        notificationList.append('<li class="list-group-item text-muted">No new notifications.</li>');
+                    } else {
+                        notifications.forEach(function (notification) {
+                            notificationList.append('<li class="list-group-item">' + notification.message + '</li>');
+                        });
+                    }
                 });
             });
         });
     </script>
     <script>
         window.addEventListener('load', function () {
-            // Adding a delay before fading out
             setTimeout(function() {
-                document.getElementById('loading-area').style.opacity = '0'; // Start fade-out
-            }, 2000); // Wait for 2 seconds before starting the fade-out
+                document.getElementById('loading-area').style.opacity = '0';
+            }, 2000);
 
-            // Optional: After the fade-out, hide the loader completely
             setTimeout(function() {
                 document.getElementById('loading-area').style.display = 'none';
-            }, 3000); // Hide loader after 3 seconds (for the complete fade-out effect)
+            }, 3000);
         });
     </script>
     <script>
         window.addEventListener('load', function() {
-            // Hide the loading screen once the page has fully loaded
             document.getElementById('loadingScreen').style.display = 'none';
         });
     </script>
-
     <script>
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("/notificationHub")
@@ -344,10 +221,6 @@
             console.error(err.toString());
         });
     </script>
-
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
-

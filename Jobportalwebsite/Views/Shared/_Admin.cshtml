@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Jobportalwebsite</title>
+    <title>@ViewData["Title"] CareerNest</title>
+    <link rel="icon" type="image/jpeg" href="~/images/icon1.png" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/bootstrap (4).css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -11,52 +12,34 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-lg" style="background-color: #12bcaa;" data-bs-theme="dark">
-
             <div class="container-fluid">
-                <img src="~/images/icon1.jpg" alt="Bootstrap" width="70" height="50" style="border-radius:50%;">
-                <a class="navbar-brand" href="#"></a>
-                
+                <img src="~/images/icon1.jpg" alt="CareerNest" width="70" height="50" style="border-radius:50%;">
+                <a class="navbar-brand" href="#">CareerNest</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="true" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse show" id="navbarColor01" style="">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            
-                                <a class="nav-link " asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                                <span class="visually-hidden">(current)</span>
-                            
+                            <a class="nav-link " asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <span class="visually-hidden">(current)</span>
                         </li>
-                         
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
-                            </li>
-                            
-                        
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link " asp-area="" asp-controller="Job" asp-action="Index">Jobs</a>
                         </li>
-
                         <li class="nav-item">
-
-                            <!-- Add to the navbar or wherever you want the chat icon -->
                             <a href="@Url.Action("Index", "Chat")" class="btn btn-primary">
                                 <i class="bi bi-chat"></i> Chat
                             </a>
                         </li>
                     </ul>
-
-
-                    
-
-
-                    <!-- Notification Icon in Navbar -->
-
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item me-3">
                             <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#notificationsModal" style="position: relative;">
@@ -65,67 +48,48 @@
                             </a>
                         </li>
                     </ul>
-
-
-                
-                 
-
-
-
                 </div>
             </div>
         </nav>
-
     </header>
-
     <div class="container-fluid">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
-
-    <footer class= footer text-muted bg-dark">
-       
-        <!-- Footer Section -->
-        <footer class="bg-dark text-white py-2">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-4">
-                        <h5>About OnyeJob</h5>
-                        <p style="font-size: 14px;">Your trusted platform for job opportunities and career advancement. Join millions of job seekers and employers today.</p>
-                        <p style="font-size: 14px;">Email: ilohonyebuchibm@gmail.com</p>
-                        <p style="font-size: 14px;">Phone: +234-8122-614-454</p>
-                    </div>
-
-                    <div class="col-md-4 footer-links">
-                        <h5>Quick Links</h5>
-                        <ul class="list-unstyled" style="font-size: 14px;">
-                            <li><a href="/about">About Us</a></li>
-                            <li><a href="/contact">Contact</a></li>
-                            <li><a href="/jobs">Browse Jobs</a></li>
-                            <li><a href="/employer/register">Post a Job</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4">
-                        <h5>Stay Connected</h5>
-                        <p style="font-size: 14px;">Follow us on social media for updates and job tips.</p>
-                        <a href="#" class="text-white"><i class="fab fa-facebook-f me-3"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-twitter me-3"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
+    <footer class="footer text-muted bg-dark">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-white">About CareerNest</h5>
+                    <p style="font-size: 14px;" class="text-white-50">Your trusted platform for job opportunities and career advancement. Join a growing community of job seekers and employers today.</p>
+                    <p style="font-size: 14px;" class="text-white-50">Email: support@careernest.com</p>
+                    <p style="font-size: 14px;" class="text-white-50">Phone: +1-555-0100</p>
                 </div>
-                <hr>
-                <p class="text-center" style="font-size: 14px;">&copy; 2024 OnyeJob. All Rights Reserved.</p>
+                <div class="col-md-4 footer-links">
+                    <h5 class="text-white">Quick Links</h5>
+                    <ul class="list-unstyled" style="font-size: 14px;">
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/jobs">Browse Jobs</a></li>
+                        <li><a href="/employer/register">Post a Job</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white">Stay Connected</h5>
+                    <p style="font-size: 14px;" class="text-white-50">Follow us on social media for updates and job tips.</p>
+                    <a href="#" class="text-white"><i class="fab fa-facebook-f me-3"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-twitter me-3"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                </div>
             </div>
-        </footer>
-        <div class="container">
-            &copy; 2024 - Jobportalwebsite - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <hr class="border-secondary">
+            <p class="text-center text-white-50" style="font-size: 14px;">&copy; @DateTime.Now.Year CareerNest. All Rights Reserved.</p>
+            <p class="text-center" style="font-size: 14px;">
+                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-white-50">Privacy</a>
+            </p>
         </div>
     </footer>
-   
-    </a>
-    <!-- Notifications Modal -->
     <div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -133,12 +97,10 @@
                     <h5 class="modal-title" id="notificationsModalLabel">Notifications</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
-                        
                     </button>
                 </div>
                 <div class="modal-body">
                     <ul id="notificationList" class="list-group">
-                        <!-- Notifications will be loaded here -->
                     </ul>
                 </div>
                 <div class="modal-footer">
@@ -149,10 +111,6 @@
             </div>
         </div>
     </div>
-   @*  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.1/js/bootstrap.min.js"></script> *@
-
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -160,34 +118,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
-    <!-- Fetch notifications count and list using AJAX -->
-
     <script>
         $(document).ready(function () {
-            // Fetch notifications
             $.get('/Admin/GetNotifications', function (notifications) {
-                console.log(notifications); // Debugging output
                 let notificationList = $('#notificationList');
                 notificationList.empty();
 
-                // Append notifications to the list
                 notifications.forEach(function (notification) {
                     notificationList.append('<li class="list-group-item">' + notification.message + '</li>');
                 });
 
-                // Update notification count badge
                 let notificationCount = notifications.length;
-                $('#notificationCount').text(notificationCount); // Update count in the navbar
-
+                $('#notificationCount').text(notificationCount);
                 if (notificationCount > 0) {
-                    $('#notificationCount').show(); // Show badge if there are notifications
+                    $('#notificationCount').show();
                 } else {
-                    $('#notificationCount').hide(); // Hide badge if no notifications
+                    $('#notificationCount').hide();
                 }
             });
-
-            // Fetch notification count separately for the navbar badge
             $.get('/Admin/GetNotificationCount', function (count) {
                 $('#notificationCount').text(count);
                 if (count > 0) {
@@ -198,14 +146,6 @@
             });
         });
     </script>
-
-  
-
-
-
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
-

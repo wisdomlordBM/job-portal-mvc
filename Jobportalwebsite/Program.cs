@@ -70,23 +70,46 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-    // Register external authentication providers
-    services.AddAuthentication()
-        .AddGoogle(options =>
+    // Register external authentication providers - only when real credentials are configured,
+    // so a missing/placeholder provider doesn't crash the whole app on startup validation.
+    var authBuilder = services.AddAuthentication();
+
+    var googleClientId = configuration["Authentication:Google:ClientId"];
+    var googleClientSecret = configuration["Authentication:Google:ClientSecret"];
+    if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+    {
+        authBuilder.AddGoogle(options =>
         {
-            options.ClientId = configuration["Authentication:Google:ClientId"];
-            options.ClientSecret = configuration["Authentication:Google:ClientSecret"];
-        })
-        .AddFacebook(options =>
-        {
-            options.AppId = configuration["Authentication:Facebook:AppId"];
-            options.AppSecret = configuration["Authentication:Facebook:AppSecret"];
-        })
-        .AddMicrosoftAccount(options =>
-        {
-            options.ClientId = configuration["Authentication:Microsoft:ClientId"];
-            options.ClientSecret = configuration["Authentication:Microsoft:ClientSecret"];
+            options.ClientId = googleClientId;
+            options.ClientSecret = googleClientSecret;
         });
+    }
+
+    var facebookAppId = configuration["Authentication:Facebook:AppId"];
+    var facebookAppSecret = configuration["Authentication:Facebook:AppSecret"];
+    if (!string.IsNullOrWhiteSpace(facebookAppId)
+        && !string.IsNullOrWhiteSpace(facebookAppSecret)
+        && facebookAppId != "YOUR_FACEBOOK_APP_ID")
+    {
+        authBuilder.AddFacebook(options =>
+        {
+            options.AppId = facebookAppId;
+            options.AppSecret = facebookAppSecret;
+        });
+    }
+
+    var microsoftClientId = configuration["Authentication:Microsoft:ClientId"];
+    var microsoftClientSecret = configuration["Authentication:Microsoft:ClientSecret"];
+    if (!string.IsNullOrWhiteSpace(microsoftClientId)
+        && !string.IsNullOrWhiteSpace(microsoftClientSecret)
+        && microsoftClientId != "YOUR_MICROSOFT_CLIENT_ID")
+    {
+        authBuilder.AddMicrosoftAccount(options =>
+        {
+            options.ClientId = microsoftClientId;
+            options.ClientSecret = microsoftClientSecret;
+        });
+    }
 }
 async Task ApplyMigrationsAndSeedRolesAsync(WebApplication app)
 {

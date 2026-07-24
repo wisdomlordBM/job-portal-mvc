@@ -20,40 +20,54 @@ namespace Jobportalwebsite.Controllers
             _notificationService = notificationService;
         }
 
+        private void AttachApplicantCounts(IEnumerable<Job> jobs)
+        {
+            var jobIds = jobs.Select(j => j.Id).ToList();
+            var counts = _context.Applications
+                .Where(a => jobIds.Contains(a.JobId))
+                .GroupBy(a => a.JobId)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            foreach (var job in jobs)
+            {
+                job.ApplicantCount = counts.TryGetValue(job.Id, out var count) ? count : 0;
+            }
+        }
+
         public IActionResult Index()
         {
-            // Fetch jobs that are posted
-            IEnumerable<Job> objJobList = _context.Jobs
+            var listedJobs = _context.Jobs
                 .Include(job => job.Company)
                 .ThenInclude(company => company!.Country)
                 .ThenInclude(country => country!.Currency)
-                .Where(x => x.PostStatus == JobPostStatus.Posted);
-            var listedJobs = objJobList.OrderByDescending(y => y.DatePosted);
+                .Where(x => x.PostStatus == JobPostStatus.Posted)
+                .OrderByDescending(y => y.DatePosted)
+                .ToList();
 
-            // Fetch notifications for the logged-in user
+            AttachApplicantCounts(listedJobs);
+
             var notifications = _context.Notifications
-                .Where(n => n.UserId == User.Identity.Name) // Ensure User.Identity.Name matches your user identifier
+                .Where(n => n.UserId == User.Identity.Name)
                 .OrderByDescending(n => n.Date)
                 .Take(10)
                 .ToList();
 
-            // Pass notifications to the view
             ViewData["Notifications"] = notifications;
 
             return View(listedJobs);
         }
+
         // Admin approves a job
         public IActionResult ApproveJob(int id)
         {
             var job = _context.Jobs.FirstOrDefault(j => j.Id == id);
             if (job != null)
             {
-                job.PostStatus = JobPostStatus.Posted; // Change the status to Post (approved)
+                job.PostStatus = JobPostStatus.Posted;
                 _context.SaveChanges();
             }
-            return RedirectToAction("Index"); // Redirect to company index or another page
+            return RedirectToAction("Index");
         }
-
 
         public IActionResult AllJobs()
         {
@@ -63,6 +77,9 @@ namespace Jobportalwebsite.Controllers
                 .ThenInclude(country => country!.Currency)
                 .Where(j => j.PostStatus == JobPostStatus.Posted)
                 .ToList();
+
+            AttachApplicantCounts(jobs);
+
             return View(jobs);
         }
 
@@ -70,7 +87,6 @@ namespace Jobportalwebsite.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            // Assuming company is linked to the logged-in user
             var companyEmail = User.Identity?.Name;
             var company = _context.Companies.FirstOrDefault(c => c.Email == companyEmail);
             if (company == null)
@@ -78,9 +94,10 @@ namespace Jobportalwebsite.Controllers
                 return RedirectToAction("CompanyRegistration", "Company");
             }
 
-            ViewBag.CompanyId = company.Id; // Pass CompanyId to the view
+            ViewBag.CompanyId = company.Id;
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateJob(Job job, IFormFile? imageFile)
@@ -99,7 +116,6 @@ namespace Jobportalwebsite.Controllers
                 job.CompanyId = company.Id;
                 job.DatePosted = DateTime.UtcNow;
 
-                // Upload image
                 if (imageFile != null && imageFile.Length > 0)
                 {
                     var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "jobs");
@@ -110,7 +126,6 @@ namespace Jobportalwebsite.Controllers
                     }
 
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-
                     var filePath = Path.Combine(uploadsFolder, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -135,7 +150,6 @@ namespace Jobportalwebsite.Controllers
             return View(job);
         }
 
-
         public IActionResult ViewApplications(int jobId)
         {
             var applications = _context.Applications
@@ -150,16 +164,14 @@ namespace Jobportalwebsite.Controllers
                     a.Contact,
                     a.Description,
                     a.DateApplied,
-                     a.PerformanceBadge, // Badge based on test score
-                    a.TestScore // Show test score
+                    a.PerformanceBadge,
+                    a.TestScore
                 }).ToList();
 
             return View(applications);
         }
 
-        //Get
         public IActionResult Edit(int? id)
-
         {
             if (id == null || id == 0)
             {
@@ -172,9 +184,9 @@ namespace Jobportalwebsite.Controllers
                 return NotFound();
             }
 
-
             return View(JobsFromDb);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Job obj, IFormFile? imageFile)
@@ -200,7 +212,6 @@ namespace Jobportalwebsite.Controllers
                     }
 
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-
                     var filePath = Path.Combine(uploadsFolder, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -223,6 +234,7 @@ namespace Jobportalwebsite.Controllers
 
             return View(obj);
         }
+
         private void ValidateSalary(Job job)
         {
             if (job.SalaryPeriod == SalaryPeriod.Negotiable)
@@ -234,9 +246,8 @@ namespace Jobportalwebsite.Controllers
                 ModelState.AddModelError(nameof(job.Salary), "Salary amount is required unless salary is negotiable.");
             }
         }
-        //Get
-        public IActionResult Delete(int? id)
 
+        public IActionResult Delete(int? id)
         {
             if (id == null || id == 0)
             {
@@ -248,10 +259,9 @@ namespace Jobportalwebsite.Controllers
                 return NotFound();
             }
 
-
             return View(JobsFromDb);
         }
-        //Post
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeletePOST(int? id)
@@ -265,26 +275,29 @@ namespace Jobportalwebsite.Controllers
             _context.SaveChanges();
             return RedirectToAction("Index", "company");
         }
+
         [HttpPost]
         public IActionResult Index(string searchString)
         {
             if (string.IsNullOrWhiteSpace(searchString))
             {
-
                 return RedirectToAction("Index");
             }
             var filteredJob = _context.Jobs
                 .Include(job => job.Company)
                 .ThenInclude(company => company!.Country)
                 .ThenInclude(country => country!.Currency)
-
                 .AsEnumerable()
                 .Where(p => p.Location.Contains(searchString, StringComparison.OrdinalIgnoreCase)
                 || p.JobTitle.Contains(searchString, StringComparison.OrdinalIgnoreCase)
                 || p.EmploymentType.Contains(searchString, StringComparison.OrdinalIgnoreCase))
                 .ToList();
+
+            AttachApplicantCounts(filteredJob);
+
             return View("Index", filteredJob);
         }
+
         public IActionResult Details(int id)
         {
             var job = _context.Jobs
@@ -297,6 +310,8 @@ namespace Jobportalwebsite.Controllers
             {
                 return NotFound();
             }
+
+            AttachApplicantCounts(new[] { job });
 
             return View(job);
         }

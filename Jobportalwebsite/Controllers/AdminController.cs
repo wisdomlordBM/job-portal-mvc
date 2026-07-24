@@ -8,19 +8,15 @@ using Microsoft.AspNetCore.Authorization;
 namespace Jobportalwebsite.Controllers
 {
     [Authorize(Roles = "Admin")]
-
-    
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly NotificationService _notificationService;
-
         public AdminController(ApplicationDbContext context, NotificationService notificationService)
         {
             _context = context;
             _notificationService = notificationService;
         }
-
         public IActionResult Index()
         {
             var notifications = _context.Notifications
@@ -28,20 +24,16 @@ namespace Jobportalwebsite.Controllers
                 .OrderByDescending(n => n.Date)
                 .Take(5)
                 .ToList();
-
             ViewData["Notifications"] = notifications;
             ViewData["UnreadCount"] = notifications.Count;
-
             return View();
         }
-
         [HttpGet]
         public IActionResult GetNotificationCount()
         {
             var unreadCount = _context.Notifications.Count(n => !n.IsRead && n.Type != NotificationType.UserAlert);
             return Json(unreadCount);
         }
-
         [HttpGet]
         public IActionResult GetNotifications()
         {
@@ -51,26 +43,19 @@ namespace Jobportalwebsite.Controllers
                 .Take(5)
                 .Select(n => new { n.Message, n.Date })
                 .ToList();
-
             return Json(notifications);
         }
-
         [HttpPost]
         public IActionResult MarkNotificationsAsRead()
         {
             var notifications = _context.Notifications.Where(n => !n.IsRead).ToList();
-
             foreach (var notification in notifications)
             {
                 notification.IsRead = true;
             }
-
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
-
-
-
         public async Task<IActionResult> Jobsekers()
         {
             //var jobseekers = await _context.Jobseekers.ToListAsync();
@@ -93,9 +78,6 @@ namespace Jobportalwebsite.Controllers
             var applications = await _context.Applications
                 .Include(x => x.User)
                 .ToListAsync();
-
-            
-
             return View(applications);
         }
         public async Task<IActionResult> ManageJobseekers()
@@ -109,7 +91,6 @@ namespace Jobportalwebsite.Controllers
             var companies = await _context.Companies.ToListAsync();
             return View(companies);
         }
-
         // View all job listings
         public async Task<IActionResult> JobListings()
         {
@@ -118,12 +99,21 @@ namespace Jobportalwebsite.Controllers
                 .ThenInclude(company => company!.Country)
                 .ThenInclude(country => country!.Currency)
                 .ToListAsync();
+
+            var jobIds = jobListings.Select(j => j.Id).ToList();
+            var counts = await _context.Applications
+                .Where(a => jobIds.Contains(a.JobId))
+                .GroupBy(a => a.JobId)
+                .ToDictionaryAsync(g => g.Key, g => g.Count());
+
+            foreach (var job in jobListings)
+            {
+                job.ApplicantCount = counts.TryGetValue(job.Id, out var count) ? count : 0;
+            }
+
             var listedJobs = jobListings.OrderByDescending(y => y.DatePosted);
             return View(listedJobs);
         }
-
-
-
         // Approve Job (Post)
         [HttpPost]
         public async Task<IActionResult> ApproveJob(int id)
@@ -136,9 +126,6 @@ namespace Jobportalwebsite.Controllers
 
             return RedirectToAction(nameof(JobListings));
         }
-
-        
-
         // Decline Job
         [HttpPost]
         public async Task<IActionResult> DeclineJob(int id)
@@ -152,8 +139,6 @@ namespace Jobportalwebsite.Controllers
 
             return RedirectToAction(nameof(JobListings)); // Redirect to job listings
         }
-
-
         // GET: Company/Delete/5
         public IActionResult DeleteCompany(int id)
         {
@@ -177,8 +162,6 @@ namespace Jobportalwebsite.Controllers
             }
             return RedirectToAction("companies");  // Redirect to the Index page after deletion
         }
-
-
         // GET: Admin/DeleteJobseeker/5
         public async Task<IActionResult> DeleteJobseeker(int id)
         {
@@ -193,7 +176,6 @@ namespace Jobportalwebsite.Controllers
 
             return View(application);
         }
-
         // POST: Admin/ConfirmDeleteJobseeker/5
         [HttpPost, ActionName("DeleteJobseeker")]
         [ValidateAntiForgeryToken]
@@ -214,6 +196,3 @@ namespace Jobportalwebsite.Controllers
     }
 
 }
-
-
-

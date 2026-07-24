@@ -1,56 +1,74 @@
 ﻿@model IEnumerable<Jobportalwebsite.Models.AnswerViewModel>
-
 @{
+    Layout = "~/Views/Shared/_Company.cshtml";
     ViewData["Title"] = "Jobseeker Test Answers";
+
+    var total = Model.Count();
+    var correct = Model.Count(a => a.IsCorrect);
+    var scorePercent = total > 0 ? (int)((double)correct / total * 100) : 0;
 }
-
-<h2>@ViewData["Title"]</h2>
-
-@if (!Model.Any())
-{
-    <p>No test answers were found for this application.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Question</th>
-                <th>Your Answer</th>
-                <th>Correct Answer</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var answer in Model)
-            {
-                <tr>
-                    <td>@answer.QuestionText</td>
-                    <td>
-                        @if (string.IsNullOrEmpty(answer.UserSelectedAnswer))
+<div class="container mt-4" style="max-width: 900px;">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+    @if (!Model.Any())
+    {
+        <p class="text-muted">No test answers were found for this application.</p>
+    }
+    else
+    {
+        <div class="card shadow-sm rounded-4 p-4 mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="text-muted small text-uppercase">
+                            <th>Question</th>
+                            <th>Your Answer</th>
+                            <th>Correct Answer</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var answer in Model)
                         {
-                            @:Not Answered
+                            <tr>
+                                <td>@answer.QuestionText</td>
+                                <td>
+                                    @if (string.IsNullOrEmpty(answer.UserSelectedAnswer))
+                                    {
+                                        <span class="text-muted">Not Answered</span>
+                                    }
+                                    else
+                                    {
+                                        @answer.UserSelectedAnswer
+                                    }
+                                </td>
+                                <td>@answer.CorrectAnswer</td>
+                                <td>
+                                    @if (answer.IsCorrect)
+                                    {
+                                        <span class="badge bg-success">Correct</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Incorrect</span>
+                                    }
+                                </td>
+                            </tr>
                         }
-                        else
-                        {
-                            @answer.UserSelectedAnswer
-                        }
-                    </td>
-                    <td>@answer.CorrectAnswer</td>
-                    <td>
-                        @if (answer.IsCorrect)
-                        {
-                            <span class="badge bg-success">Correct</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-danger">Incorrect</span>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-
-
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card shadow-sm rounded-4 p-4 mb-4 d-flex flex-row align-items-center justify-content-between">
+            <div>
+                <div class="text-muted small text-uppercase">Score Summary</div>
+                <div class="fs-5 fw-semibold">@correct / @total correct</div>
+            </div>
+            <div class="fs-3 fw-bold @(scorePercent >= 80 ? "text-success" : scorePercent >= 50 ? "text-warning" : "text-danger")">
+                @scorePercent%
+            </div>
+        </div>
+    }
+    <a href="javascript:history.back()" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left-circle"></i> Back
+    </a>
+</div>

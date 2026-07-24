@@ -1,107 +1,156 @@
 ﻿@model IEnumerable<Jobportalwebsite.Models.ApplicationViewModel>
-
 @{
     Layout = "~/Views/Shared/_Company.cshtml";
 }
 
-@if (TempData["Message"] != null)
-{
-    <div class="alert alert-info">
-        @TempData["Message"]
-    </div>
-}
+<style>
+    .applicant-card {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        transition: box-shadow 0.15s ease;
+    }
 
-<h2 class="mb-4">Applications</h2>
-<div class="row">
-    @foreach (var application in Model)
+        .applicant-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+        }
+
+    .applicant-avatar {
+        width: 72px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #6c757d;
+    }
+</style>
+
+<div class="container mt-4">
+    @if (TempData["Message"] != null)
     {
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm">
-                <img src="~/@application.ImageUrl" alt="Job Image" class="card-img-top" style="height: 150px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title">@application.JobTitle</h5>
+        <div class="alert alert-info">
+            @TempData["Message"]
+        </div>
+    }
 
+    <h2 class="mb-4">Applications</h2>
 
-                    <div class="text-center mb-3">
-                        <a href="@Url.Action("Details", "Jobseekers", new { email = application.Email })">
-                            <img src="@Url.Content(application.ProfilePicturePath ?? "/uploads/default-profile.png")"
-                                 onerror="this.onerror=null; this.src='/uploads/default-profile.png';"
-                                 alt="Profile Picture"
-                                 class="rounded-circle"
-                                 style="width: 80px; height: 80px; object-fit: cover; border: 2px solid #ddd;">
-                        </a>
-                    </div>
+    @if (!Model.Any())
+    {
+        <p class="text-muted">No applications yet.</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var application in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card applicant-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <a href="@Url.Action("Details", "Jobseekers", new { email = application.Email })">
+                                    <img src="@Url.Content(application.ProfilePicturePath ?? "/uploads/default-profile.png")"
+                                         onerror="this.onerror=null; this.src='/uploads/default-profile.png';"
+                                         alt="Profile Picture"
+                                         class="applicant-avatar" />
+                                </a>
+                                <div>
+                                    <h5 class="mb-0">@application.FirstName @application.LastName</h5>
+                                    <div class="text-muted small">Applied for @application.JobTitle</div>
+                                </div>
+                            </div>
 
+                            @if (application.TestScore.HasValue && !string.IsNullOrEmpty(application.PerformanceBadge))
+                            {
+                                <span class="badge mb-3 @(application.PerformanceBadge == "Success" ? "bg-success" :
+                                                          application.PerformanceBadge == "Medium" ? "bg-warning text-dark" :
+                                                          "bg-danger")">
+                                    @application.PerformanceBadge (@application.TestScore.Value%)
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary mb-3">No Test Taken</span>
+                            }
 
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div class="info-label">Email</div>
+                                    <div class="small">@application.Email</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-label">Phone</div>
+                                    <div class="small">@(application.PhoneNumber ?? "N/A")</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-label">Location</div>
+                                    <div class="small">@application.City, @application.Location</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-label">Employment Type</div>
+                                    <div class="small">@application.EmploymentType</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-label">Education</div>
+                                    <div class="small">@application.EducationLevel</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="info-label">Salary</div>
+                                    <div class="small">@Jobportalwebsite.Helper.SalaryFormatter.Format(application.Salary, application.CurrencySymbol, application.SalaryPeriod)</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="info-label">Applied On</div>
+                                    <div class="small">@application.DateApplied.ToString("MMM dd, yyyy - h:mm tt")</div>
+                                </div>
+                            </div>
 
+                            @if (!string.IsNullOrEmpty(application.Description))
+                            {
+                                <p class="small text-muted mb-3">"@application.Description"</p>
+                            }
 
+                            @if (!string.IsNullOrEmpty(application.CVPath))
+                            {
+                                <a href="@Url.Content(application.CVPath)" target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-3">
+                                    <i class="bi bi-file-earmark-text"></i> View CV
+                                </a>
+                            }
+                            else
+                            {
+                                <p class="small text-muted mb-3">No CV uploaded.</p>
+                            }
 
-                    <!-- Badge for Test Performance -->
-                    @if (application.TestScore.HasValue && !string.IsNullOrEmpty(application.PerformanceBadge))
-                    {
-                        <div class="mb-2">
-                            <span class="badge @(application.PerformanceBadge == "Success" ? "bg-success" :
-                                                  application.PerformanceBadge == "Medium" ? "bg-warning" :
-                                                  "bg-danger")">
-                                @application.PerformanceBadge
-                            </span>
-                            <span class="text-muted">(@application.TestScore.Value%)</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <form asp-controller="Company" asp-action="Check" method="post">
+                                    <input type="hidden" name="applicationId" value="@application.Id" />
+                                    <button type="submit" class="btn btn-warning btn-sm">Check</button>
+                                </form>
+
+                                <form asp-controller="Company" asp-action="Accept" method="post">
+                                    <input type="hidden" name="applicationId" value="@application.Id" />
+                                    <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                </form>
+
+                                <form asp-controller="Company" asp-action="Decline" method="post">
+                                    <input type="hidden" name="applicationId" value="@application.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                                </form>
+
+                                <a href="@Url.Action("ViewAnswers", "Company", new { applicationId = application.Id })" class="btn btn-info btn-sm">
+                                    View Answers
+                                </a>
+                            </div>
                         </div>
-                    }
-                    else
-                    {
-                        <div class="mb-2">
-                            <span class="badge bg-secondary">No Test Taken</span>
-                        </div>
-                    }
-
-                    <p class="card-text">
-                        <strong>Applicant:</strong> @application.FirstName @application.LastName <br />
-                        <strong>Email:</strong> @application.Email <br />
-                        <strong>Phone:</strong> @application.PhoneNumber <br />
-                        <strong>Location:</strong> @application.Location <br />
-                        <strong>Type:</strong> @application.EmploymentType <br />
-                        <strong>Education Level:</strong> @application.EducationLevel <br />
-                        <strong>City:</strong> @application.City <br />
-                        <strong>Description:</strong> @application.Description <br />
-                        <strong>Salary:</strong> @Jobportalwebsite.Helper.SalaryFormatter.Format(application.Salary, application.CurrencySymbol, application.SalaryPeriod) <br />
-                        <strong>Applied On:</strong> @application.DateApplied.ToString("g")
-                    </p>
-
-                    @if (!string.IsNullOrEmpty(application.CVPath))
-                    {
-                        <a href="@Url.Content(application.CVPath)" target="_blank" class="btn btn-primary mb-2">View CV</a>
-                    }
-                    else
-                    {
-                        <p>No CV uploaded.</p>
-                    }
-
-                    <div class="d-flex justify-content-between">
-                        <form asp-controller="Company" asp-action="Check" method="post">
-                            <input type="hidden" name="applicationId" value="@application.Id" />
-                            <button type="submit" class="btn btn-warning btn-sm">Check</button>
-                        </form>
-
-                        <form asp-controller="Company" asp-action="Accept" method="post">
-                            <input type="hidden" name="applicationId" value="@application.Id" />
-                            <button type="submit" class="btn btn-success btn-sm">Accept</button>
-                        </form>
-
-                        <form asp-controller="Company" asp-action="Decline" method="post">
-                            <input type="hidden" name="applicationId" value="@application.Id" />
-                            <button type="submit" class="btn btn-danger btn-sm">Decline</button>
-                        </form>
-
-                        <a href="@Url.Action("ViewAnswers", "Company", new { applicationId = application.Id })" class="btn btn-info btn-sm">
-                            View Answers
-                        </a>
-
                     </div>
-
                 </div>
-            </div>
+            }
         </div>
     }
 </div>
-
