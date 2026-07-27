@@ -20,7 +20,7 @@ namespace Jobportalwebsite.Data
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Reply> Replies { get; set; } // Add Replies DbSet
-        public DbSet<ApplicationUser> Users { get; set; }
+        public override DbSet<ApplicationUser> Users { get; set; }
         public DbSet<JobSeekerAnswer> JobSeekerAnswers { get; set; }
         public DbSet<JobSkillTest> JobSkillTests { get; set; }
         public DbSet<Message> Messages { get; set; }

@@ -7,7 +7,7 @@ namespace Jobportalwebsite.Models
     public class Application
     {
         public int Id { get; set; }
-        public DateTime DateApplied { get; set; } = DateTime.Now;
+        public DateTime DateApplied { get; set; } = DateTime.UtcNow;
         public string? Description { get; set; }
         public string? Contact { get; set; }
         public string? EducationLevel { get; set; }

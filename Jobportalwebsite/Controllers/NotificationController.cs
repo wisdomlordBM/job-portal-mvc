@@ -29,7 +29,7 @@ namespace Jobportalwebsite.Controllers
             {
                 Message = "A new job has been posted.",
                 IsRead = false,
-                Date = DateTime.Now,
+                Date = DateTime.UtcNow,
                 Type = NotificationType.NewJob,
                 JobId = job.Id,
                 JobTitle = job.JobTitle,
@@ -47,7 +47,7 @@ namespace Jobportalwebsite.Controllers
             {
                 Message = "A new company has registered.",
                 IsRead = false,
-                Date = DateTime.Now,
+                Date = DateTime.UtcNow,
                 Type = NotificationType.NewCompany,
                 CompanyId = company.Id,
                 CompanyName = company.Name,

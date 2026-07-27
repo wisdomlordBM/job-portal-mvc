@@ -6,7 +6,6 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Mono.TextTemplating;
 using System.Diagnostics.Metrics;
-using Jobportalwebsite.Migrations;
 using Microsoft.AspNetCore.Authorization;
 using System.IO;
 using System.Linq;
@@ -148,7 +147,7 @@ namespace Jobportalwebsite.Controllers
                     Country = application.Country,
                     EmploymentType = application.EmploymentType,
                     UserId = userId,
-                    DateApplied = DateTime.Now
+                    DateApplied = DateTime.UtcNow
                 };
 
                 _context.Applications.Add(myApplication);

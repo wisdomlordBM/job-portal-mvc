@@ -52,9 +52,10 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     // Register application services
     services.AddScoped<IUserHelper, UserHelper>();
     services.AddScoped<NotificationService>();
+    services.AddScoped<FileStorageService>();
     // Configure DbContext to use SQL Server
     services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
     // Configure Identity services
     services.AddDefaultIdentity<ApplicationUser>(options =>
     {

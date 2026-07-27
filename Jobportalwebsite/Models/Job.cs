@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Jobportalwebsite.Models
 {
     public class Job
@@ -14,13 +13,13 @@ namespace Jobportalwebsite.Models
         public int? CompanyId { get; set; }
         [ForeignKey(nameof(CompanyId))]
         public virtual Company? Company { get; set; }
-        public string? RequiredSkills { get; set; } 
-        public string? Location { get; set; } 
-        public string? EmploymentType { get; set; } 
+        public string? RequiredSkills { get; set; }
+        public string? Location { get; set; }
+        public string? EmploymentType { get; set; }
         public decimal? Salary { get; set; }
         [Required(ErrorMessage = "Salary period is required")]
         public SalaryPeriod? SalaryPeriod { get; set; }
-        public DateTime DatePosted { get; set; } = DateTime.Now;
+        public DateTime DatePosted { get; set; } = DateTime.UtcNow;
         public JobPostStatus PostStatus { get; set; } = JobPostStatus.Pending;
         public virtual ICollection<JobSkillTest> SkillTests { get; set; } = new List<JobSkillTest>();
         public string? ImageUrl { get; set; }
@@ -31,7 +30,7 @@ namespace Jobportalwebsite.Models
     {
         Pending = 1,
         Posted = 2,
-        Declined  = 3,
+        Declined = 3,
     }
     public enum SalaryPeriod
     {

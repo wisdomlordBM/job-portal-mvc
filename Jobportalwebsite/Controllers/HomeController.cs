@@ -32,7 +32,8 @@ namespace Jobportalwebsite.Controllers
 
             return View(objJobList); // Passing the job list to the view
         }
-
+        [HttpGet]
+        public IActionResult Health() => Ok("healthy");
         public IActionResult Privacy()
         {
             return View();

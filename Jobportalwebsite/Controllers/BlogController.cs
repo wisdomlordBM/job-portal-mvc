@@ -223,7 +223,7 @@ namespace Jobportalwebsite.Controllers
                 }
 
                 blog.PicturePaths = picturePaths; 
-                blog.DateCreated = DateTime.Now;
+                blog.DateCreated = DateTime.UtcNow;
                 blog.CreatedBy = User.Identity.Name;
                 _context.Blogs.Add(blog);
                 await _context.SaveChangesAsync();
@@ -269,7 +269,7 @@ namespace Jobportalwebsite.Controllers
             var comment = new Comment
             {
                 CommentText = commentText,
-                DateCommented = DateTime.Now,
+                DateCommented = DateTime.UtcNow,
                 IsAnonymous = isAnonymous,
                 BlogId = blogId,
                 CommentedBy = isAnonymous ? null : User.Identity.Name,
@@ -299,7 +299,7 @@ namespace Jobportalwebsite.Controllers
             var reply = new Reply
             {
                 ReplyText = replyText,
-                DateReplied = DateTime.Now,
+                DateReplied = DateTime.UtcNow,
                 IsAnonymous = isAnonymous,
                 RepliedBy = isAnonymous ? null : User.Identity.Name,
                 ProfilePicturePath = profilePicturePath,
