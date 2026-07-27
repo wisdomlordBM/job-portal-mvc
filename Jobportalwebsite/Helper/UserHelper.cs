@@ -45,7 +45,7 @@ namespace Jobportalwebsite.Helper
                 Address = model.Address,
                 Gender = model.Gender,
                 DateOfBirth = model.DateOfBirth,
-                DateCreated = DateTime.Now,
+                DateCreated = DateTime.UtcNow,
                 PhoneNumber = model.PhoneNumber,
                 State = model.State,
                 Country = country?.Name,

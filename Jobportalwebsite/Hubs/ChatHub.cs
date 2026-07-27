@@ -27,7 +27,7 @@ namespace Jobportalwebsite.Hubs
                 SenderUserName = fromUserName,
                 ReceiverUserName = toUserName,
                 Message = message,
-                Timestamp = DateTime.Now
+                Timestamp = DateTime.UtcNow
             };
 
             _context.ChatMessages.Add(chatMessage);

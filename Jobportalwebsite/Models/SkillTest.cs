@@ -10,8 +10,8 @@ namespace Jobportalwebsite.Models
         public string? Description { get; set; }
         public string? Difficulty { get; set; } // Easy, Medium, Hard
         public string? Category { get; set; } // E.g., Programming, Marketing
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public virtual ICollection<Question>? Questions { get; set; }
     }

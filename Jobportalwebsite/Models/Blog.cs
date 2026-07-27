@@ -66,31 +66,6 @@ namespace Jobportalwebsite.Models
         public Comment? Comment { get; set; }
     }
 
-    //public class Blog
-    //{
-    //    public int Id { get; set; }
-    //    public string? Title { get; set; }
-    //    public string? Description { get; set; }
-    //    public List<string> PicturePaths { get; set; } = new List<string>();
-    //    public DateTime DateCreated { get; set; }
-    //    public bool Deleted { get; set; }
-    //    public string? CreatedBy { get; set; } 
-    //    public int? CompanyId { get; set; }
-    //    public virtual Company? Company { get; set; }
-    //    public ICollection<Comment>? Comments { get; set; }
-    //}
-    //public class Comment
-    //{
-    //    public int Id { get; set; }  
-    //    public string? CommentText { get; set; }
-    //    public DateTime DateCommented { get; set; }
-    //    public bool IsAnonymous { get; set; }
-    //    public string? CommentedBy { get; set; }
-    //     public string? ProfilePicturePath { get; set; } // Path to the profile picture or null for anonymous
-    //    public int? ParentCommentId { get; set; } // For replies
-    //    public ICollection<Comment>? Replies { get; set; } // Nested replies
-    //    public int BlogId { get; set; }
-    //    public Blog? Blog { get; set; }  
-    //}
+ 
 }
 

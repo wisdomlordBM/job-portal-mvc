@@ -35,7 +35,7 @@ namespace Jobportalwebsite.Data
                 Email = email,
                 EmailConfirmed = true,
                 Role = "Admin",
-                DateCreated = DateTime.Now
+                DateCreated = DateTime.UtcNow
             };
 
             var result = await userManager.CreateAsync(admin, password);
