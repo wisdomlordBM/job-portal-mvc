@@ -1,36 +1,36 @@
-﻿@model List<Job>  
+﻿@model List<Job>
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-}
-@{
     ViewData["Title"] = "Home Page";
 }
 
 <style>
-    .container-fluid.wall {
-        background-image: url('/images/obi4.jpg');
-        background-size: cover;
-        background-position: center;
-        height: 65vh;
-        color: white;
+    .hero-carousel .carousel-item img {
+        height: 60vh;
+        object-fit: cover;
     }
 
-    .work {
-        text-align: center;
-        color: aqua;
+    @@media (max-width: 768px) {
+        .hero-carousel .carousel-item img {
+            height: 40vh;
+        }
+
+        .hero-carousel .display-4 {
+            font-size: 1.6rem;
+        }
+
+        .hero-carousel .lead {
+            font-size: 0.95rem;
+        }
     }
 
     .footer-links a {
@@ -41,76 +41,267 @@
         .footer-links a:hover {
             text-decoration: underline;
         }
-   
-</style>
-<div id="demo" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
 
- 
+    /* ---- Shared section styling ---- */
+    .section-eyebrow {
+        color: #12bcaa;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    .why-card {
+        background: #fff;
+        border: 1px solid #eef0f2;
+        border-radius: 16px;
+        padding: 2rem 1.5rem;
+        height: 100%;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+        .why-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 28px rgba(18,188,170,0.15);
+            border-color: #12bcaa;
+        }
+
+    .why-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: rgba(18,188,170,0.1);
+        color: #12bcaa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem auto;
+    }
+
+    .features-section {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px;
+        padding: 1.75rem 1.5rem;
+        height: 100%;
+        transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            background: rgba(18,188,170,0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+        }
+
+    .feature-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: #12bcaa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: #fff;
+    }
+
+    .floating-img-wrap {
+        position: relative;
+        display: inline-block;
+    }
+
+    .floating-img {
+        animation: floatY 4s ease-in-out infinite;
+        max-width: 100%;
+    }
+
+    @@keyframes floatY {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-14px);
+        }
+    }
+
+    .badge-pop {
+        position: absolute;
+        bottom: 10px;
+        right: -10px;
+        background: #12bcaa;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        animation: popIn 0.6s ease 0.8s both, floatY 4s ease-in-out infinite;
+    }
+
+    @@keyframes popIn {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        70% {
+            transform: scale(1.15);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    /* Employer section */
+    .employer-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    .stat-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(18,188,170,0.1);
+        color: #0d8f83;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Final CTA */
+    .cta-section {
+        background: linear-gradient(135deg, #12bcaa 0%, #0d8f83 100%);
+        border-radius: 24px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .cta-section::before {
+            content: "";
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+        }
+
+        .cta-section::after {
+            content: "";
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+            bottom: -80px;
+            left: -60px;
+        }
+
+    #jobCarousel {
+        background-color: #e0e0e0;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: #000;
+        border-radius: 50%;
+        padding: 10px;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        filter: invert(1);
+    }
+
+    /* Scroll reveal */
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    @@media (max-width: 768px) {
+        .badge-pop {
+            right: 8px;
+            bottom: -12px;
+            font-size: 0.7rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .employer-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div id="demo" class="carousel slide carousel-fade hero-carousel" data-bs-ride="carousel" data-bs-interval="5000">
     <div class="carousel-indicators">
         <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
         <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
         <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
     </div>
 
-    
     <div class="carousel-inner">
-        
         <div class="carousel-item active">
-            <img src="~/images/freepik__upload__51312.jpeg" alt="Find Your Dream Job" class="d-block w-100" loading="lazy" style="height: 80vh; object-fit: cover;">
-            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center text-white" style="height: 100%;">
+            <img src="~/images/freepik__upload__51312.jpeg" alt="Find Your Dream Job" class="d-block w-100" loading="lazy">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center text-white h-100">
                 <h1 class="display-4 fw-bold">
-                    <i class="fa fa-briefcase" style="font-size:50px;color:#12bcaa;"></i>
+                    <i class="fa fa-briefcase" style="color:#12bcaa;"></i>
                     Find Your Dream Job Today!
                 </h1>
                 <p class="lead mt-3">
                     Explore top job opportunities. Register your company or apply for your next big career move with ease.
                 </p>
-                <div class="mt-4">
-                    <a class="btn btn-primary btn-lg" style="background-color: #12bcaa; border: none;" asp-area="" asp-controller="Account" asp-action="Login">
-                        Browse Jobs
-                    </a>
-                    <a class="btn btn-outline-secondary btn-lg" asp-area="" asp-controller="Account" asp-action="Register">Register Now</a>
+                <div class="mt-3">
+                    <a class="btn btn-primary btn-lg" style="background-color:#12bcaa;border:none;" asp-controller="Account" asp-action="Login">Browse Jobs</a>
+                    <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Register">Register Now</a>
                 </div>
             </div>
         </div>
 
-      
         <div class="carousel-item">
-            <img src="~/images/coins-job-word.jpg" alt="Build Your Career" class="d-block w-100" loading="lazy" style="height: 80vh; object-fit: cover;">
-            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center text-white" style="height: 100%;">
-                <h1 class="display-4 fw-bold">
-                    Unlock Your Career Potential!
-                </h1>
-                <p class="lead mt-3">
-                    Create a profile and get matched with jobs tailored to your skills and interests. Start your journey today!
-                </p>
-                <div class="mt-4">
-                    
-                     
-                    <a class="btn btn-outline-secondary btn-lg" style="background-color: #12bcaa; border: none;" asp-area="" asp-controller="Account" asp-action="Register"> Create Profile</a>
+            <img src="~/images/coins-job-word.jpg" alt="Build Your Career" class="d-block w-100" loading="lazy">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center text-white h-100">
+                <h1 class="display-4 fw-bold">Unlock Your Career Potential!</h1>
+                <p class="lead mt-3">Create a profile and get matched with jobs tailored to your skills and interests.</p>
+                <div class="mt-3">
+                    <a class="btn btn-outline-light btn-lg" style="background-color:#12bcaa;border:none;" asp-controller="Account" asp-action="Register">Create Profile</a>
                 </div>
             </div>
         </div>
 
-      
         <div class="carousel-item">
-            <img src="~/images/hul.jpg" alt="Hire Top Talent" class="d-block w-100" loading="lazy" style="height: 80vh; object-fit: cover;">
-            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center text-white" style="height: 100%;">
-                <h1 class="display-4 fw-bold">
-                    Hire the Best Talent!
-                </h1>
-                <p class="lead mt-3">
-                    Post job listings and connect with skilled professionals. Build your team for success.
-                </p>
-                <div class="mt-4">
-                   
-                    <a class="btn btn-primary btn-lg" style="background-color: #12bcaa; border: none;" asp-area="" asp-controller="Account" asp-action="CompanyRegister">Post a Job</a>
+            <img src="~/images/hul.jpg" alt="Hire Top Talent" class="d-block w-100" loading="lazy">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center text-white h-100">
+                <h1 class="display-4 fw-bold">Hire the Best Talent!</h1>
+                <p class="lead mt-3">Post job listings and connect with skilled professionals. Build your team for success.</p>
+                <div class="mt-3">
+                    <a class="btn btn-primary btn-lg" style="background-color:#12bcaa;border:none;" asp-controller="Account" asp-action="CompanyRegister">Post a Job</a>
                 </div>
             </div>
         </div>
     </div>
 
-  
     <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
         <span class="carousel-control-prev-icon"></span>
     </button>
@@ -119,61 +310,90 @@
     </button>
 </div>
 
-
-
-
-
-<div class="container-fluid mt-5">
-    <div class="row text-center">
-        <div class="col-sm-4">
-            <h3>Work From Home <i class="bi bi-house-fill"></i></h3>
-            <p>Embrace the freedom of working from the comfort of your home. Choose flexible schedules that fit your lifestyle and enjoy greater work-life balance.</p>
-            <p>Hundreds of companies worldwide are actively seeking remote talent. Don't miss your chance—apply today and secure your ideal work-from-home job!</p>
+<!-- Why CareerNest -->
+<div class="container my-5 py-3">
+    <div class="text-center mb-5 reveal">
+        <div class="section-eyebrow">Why CareerNest</div>
+        <h2 class="fw-bold">Everyone finds their fit here</h2>
+    </div>
+    <div class="row g-4 text-center">
+        <div class="col-12 col-md-4 reveal">
+            <div class="why-card">
+                <div class="why-icon"><i class="bi bi-house-fill"></i></div>
+                <h5>Work From Home</h5>
+                <p class="text-muted mb-0">Flexible schedules and remote roles from companies hiring worldwide, right now.</p>
+            </div>
         </div>
-        <div class="col-sm-4">
-            <h3>Work from Office <i class="bi bi-buildings-fill"></i></h3>
-            <p>Looking for an in-office job? We connect you with companies in your area and beyond, offering exciting career opportunities.</p>
-            <p>Explore openings at top organizations, network with professionals, and boost your career growth. Find your dream office job today—apply now!</p>
+        <div class="col-12 col-md-4 reveal" style="transition-delay:0.1s;">
+            <div class="why-card">
+                <div class="why-icon"><i class="bi bi-buildings-fill"></i></div>
+                <h5>Work From Office</h5>
+                <p class="text-muted mb-0">Connect with employers near you and explore in-office opportunities that fit your goals.</p>
+            </div>
         </div>
-        <div class="col-sm-4">
-            <h3>Company Registration <i class="bi bi-building-fill"></i></h3>
-            <p>Are you a company in search of talented employees? Register with us to gain access to a vast pool of qualified job seekers from around the globe.</p>
-            <p>Our platform makes it easy to connect with the right candidates, saving time and resources. Expand your reach and grow your team—register now!</p>
+        <div class="col-12 col-md-4 reveal" style="transition-delay:0.2s;">
+            <div class="why-card">
+                <div class="why-icon"><i class="bi bi-building-fill-add"></i></div>
+                <h5>Company Registration</h5>
+                <p class="text-muted mb-0">Register your company and get instant access to a vast pool of qualified candidates.</p>
+            </div>
         </div>
     </div>
 </div>
 
-
-
-
-
-<div class="container-fluid p-5 my-5 bg-dark text-white">
-    <div class="row">
-        <div class="col-sm-4">
-            <h1>Work From Home</h1>
-            <p>Take control of your career with flexible, remote work opportunities. Whether you're looking for full-time or part-time roles, we have you covered.</p>
-            <p>Global companies are actively seeking remote talent across various industries. Don’t wait—apply now and work from anywhere in the world.</p>
-            <h2><i class="bi bi-bell-fill"></i> Advance Your Career with OnyeJob</h2>
-            <p>Create a free account, complete your profile, and get matched with jobs tailored to your skills and preferences. Your dream job is just a few clicks away.</p>
+<!-- Feature highlight with floating image -->
+<div class="container-fluid p-4 p-md-5 my-5 bg-dark text-white features-section">
+    <div class="row g-4 align-items-center">
+        <div class="col-12 col-md-7">
+            <div class="row g-4">
+                <div class="col-12 col-sm-6 reveal">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+                        <h4 class="mt-3">Fast, Simple Applications</h4>
+                        <p class="text-white-50">
+                            Create a profile once and apply to roles in a couple of clicks — no repeated forms.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 reveal" style="transition-delay: 0.15s;">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-bell-fill"></i>
+                        </div>
+                        <h4 class="mt-3">Stay Ahead with Job Alerts</h4>
+                        <p class="text-white-50">
+                            Get personalized job alerts based on your experience, industry, and location preferences.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <a class="btn btn-outline-light btn-lg mt-4 reveal" style="transition-delay: 0.3s;" asp-controller="Account" asp-action="Register">
+                Get Started <i class="bi bi-arrow-right ms-1"></i>
+            </a>
         </div>
-        <div class="col-sm-4">
-            <h1>Stay Ahead with Job Alerts</h1>
-            <p>Never miss an opportunity. Get personalized job alerts based on your experience, industry, and location preferences.</p>
-            <p>Receive notifications about the best job openings that match your profile and take the next step in your career today.</p>
-            <h2>Access Opportunities That Matter</h2>
-            <p>Join a community of professionals and discover roles that align with your career goals. Sign up now to unlock your potential.</p>
-        </div>
-        <div class="col-md-4 text-center">
-            <img src="~/images/img1.jpeg" class="img-fluid rounded" alt="Work from Home Image" />
+        <div class="col-12 col-md-5 text-center reveal" style="transition-delay: 0.2s;">
+            <div class="floating-img-wrap">
+                <img src="~/images/img1.jpeg" class="img-fluid rounded-4 shadow floating-img" alt="Work from Home" />
+                <span class="badge-pop">
+                    <i class="bi bi-lightning-charge-fill"></i> Live Openings Daily
+                </span>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Latest jobs carousel -->
 <div class="container my-5">
-    <h2 class="text-center text-primary mb-4">Discover Your Next Career Opportunity</h2>
+    <div class="text-center mb-4 reveal">
+        <div class="section-eyebrow">Fresh Off the Board</div>
+        <h2 class="fw-bold text-dark">Discover Your Next Career Opportunity</h2>
+    </div>
 
     @if (Model != null && Model.Count > 0)
     {
-        <div id="jobCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+        <div id="jobCarousel" class="carousel slide reveal" data-bs-ride="carousel" data-bs-interval="4000">
             <div class="carousel-inner">
                 @for (int i = 0; i < Model.Count; i++)
                 {
@@ -183,9 +403,9 @@
                     : job.Company.ProfilePicturePath;
 
                     <div class="carousel-item @(i == 0 ? "active" : "")">
-                        <div class="d-flex justify-content-center">
-                            <div class="card shadow-sm rounded-4" style="max-width: 650px; width: 100%;">
-                                <div class="card-body d-flex gap-3">
+                        <div class="d-flex justify-content-center px-2">
+                            <div class="card shadow-sm rounded-4 w-100" style="max-width: 650px;">
+                                <div class="card-body d-flex flex-column flex-sm-row gap-3">
                                     <img src="@logoPath" alt="@job.Company?.Name" style="width:64px;height:64px;object-fit:cover;border-radius:10px;flex-shrink:0;" />
                                     <div class="flex-grow-1">
                                         <h5 class="mb-1">@job.JobTitle</h5>
@@ -209,9 +429,7 @@
                                                 @Jobportalwebsite.Helper.SalaryFormatter.Format(job.Salary, job.Company?.Country?.Currency?.Symbol, job.SalaryPeriod)
                                             </span>
                                         </div>
-                                        <a asp-controller="Job" asp-action="Details" asp-route-id="@job.Id" class="btn btn-outline-success btn-sm">
-                                            View Details
-                                        </a>
+                                        <a asp-controller="Job" asp-action="Details" asp-route-id="@job.Id" class="btn btn-outline-success btn-sm">View Details</a>
                                     </div>
                                 </div>
                             </div>
@@ -238,65 +456,58 @@
         <p class="text-center text-muted">No jobs available at the moment.</p>
     }
 </div>
-<div class="container-fluid p-5 bg-light my-5">
-    <div class="row">
-        <div class="col-md-6">
-            <h2 class="display-4 text-primary">FOR EMPLOYERS</h2>
-            <p>Searching for the right talent? We have over 3 million+ job-seekers across all levels, ready for your organization. Post a job today and get matched with top candidates.</p>
-            <p>Reach workers from around the globe, whether for remote or in-office roles. Register now to start hiring the best talent available.</p>
-            
-            <a class="btn btn-primary" asp-area="" asp-controller="Account" asp-action="CompanyRegister">Post a Job</a>
-        </div>
-        <div class="col-md-6">
-            <img src="~/images/pexels-cottonbro-6535346.jpg" alt="Employer Hiring" class="img-fluid rounded">
-        </div>
-    </div>
-</div>
 
-<div class="container-fluid p-5 bg-dark text-white my-5">
-    <div class="row">
-        <div class="col-md-8">
-            <h2 class="display-4">Apply Now</h2>
-            <p>Find your dream job today! Whether you’re looking for remote or on-site positions, we have opportunities for every skill set and experience level.</p>
-            <p>Many companies are hiring right now. Apply now to start your career with us!</p>
-           
-            <a class="btn btn-outline-light btn-lg" asp-area="" asp-controller="Account" asp-action="Register">Create Profile</a>
-        </div>
-        <div class="col-md-4">
-            <img src="~/images/img1.jpeg" alt="Apply Now" class="img-fluid rounded">
+<!-- For Employers -->
+<div class="container my-5">
+    <div class="employer-card reveal">
+        <div class="row g-4 align-items-center">
+            <div class="col-12 col-md-6">
+                <div class="section-eyebrow">For Employers</div>
+                <h2 class="fw-bold text-dark">Hire smarter, hire faster</h2>
+                <p class="text-muted">
+                    Searching for the right talent? Thousands of job-seekers across every level are ready for your organization.
+                </p>
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <span class="stat-pill"><i class="bi bi-people-fill"></i> 3M+ Job Seekers</span>
+                    <span class="stat-pill"><i class="bi bi-globe"></i> Remote & On-site</span>
+                </div>
+                <a class="btn btn-primary btn-lg" style="background-color:#12bcaa;border:none;" asp-controller="Account" asp-action="CompanyRegister">
+                    Post a Job <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="col-12 col-md-6">
+                <img src="~/images/pexels-cottonbro-6535346.jpg" alt="Employer Hiring" class="img-fluid rounded-4 shadow-sm">
+            </div>
         </div>
     </div>
 </div>
 
-<div class="container-fluid p-5 bg-light text-center my-5">
-    <h2 class="text-primary">Advance Your Career Today</h2>
-    <p>Sign up for customized job alerts based on your skills, experience, and location. Get notified about opportunities that matter to you!</p>
-    
-    <a class="btn btn-primary btn-lg" asp-area="" asp-controller="Account" asp-action="Register">Sign Up for Alerts</a>
+<!-- Final CTA -->
+<div class="container my-5">
+    <div class="cta-section text-center p-4 p-md-5 reveal">
+        <i class="bi bi-bell-fill" style="font-size: 2rem;"></i>
+        <h2 class="fw-bold mt-2">Advance Your Career Today</h2>
+        <p class="mb-4 opacity-75">Sign up for customized job alerts based on your skills, experience, and location.</p>
+        <a class="btn btn-light btn-lg fw-semibold" style="color:#0d8f83;" asp-controller="Account" asp-action="Register">
+            Sign Up for Alerts <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
 </div>
 
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const revealEls = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
 
-
-<style>
-   
-    #jobCarousel {
-        background-color: #e0e0e0; 
-    }
-
-   
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        background-color: #000; 
-        border-radius: 50%; 
-        padding: 10px;
-    }
-
-   
-    .carousel-control-prev,
-    .carousel-control-next {
-        filter: invert(1); 
-    }
-</style>
-   
-
-
+            revealEls.forEach(el => observer.observe(el));
+        });
+    </script>
+}
