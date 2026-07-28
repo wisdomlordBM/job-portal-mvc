@@ -1,14 +1,9 @@
 ﻿// Minimal service worker — exists only to satisfy PWA installability requirements.
-// Deliberately does NOT cache anything, so users always see fresh job listings,
-// applications, and notifications rather than stale cached data.
+// No caching, no offline behavior — every request always goes to the network.
 self.addEventListener('install', () => {
     self.skipWaiting();
 });
 
 self.addEventListener('activate', () => {
     self.clients.claim();
-});
-
-self.addEventListener('fetch', () => {
-    // Always pass through to the network — no caching, no offline fallback.
 });
