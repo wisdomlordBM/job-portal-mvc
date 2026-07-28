@@ -33,11 +33,11 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Job" asp-action="Index">Jobs</a>
                         </li>
-                        <li class="nav-item">
+                       @*  <li class="nav-item">
                             <a href="@Url.Action("Index", "Chat")" class="btn btn-primary">
                                 <i class="bi bi-chat"></i> Chat
                             </a>
-                        </li>
+                        </li> *@
                         @if (User.Identity.IsAuthenticated && User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value == "Jobseeker")
                         {
                             <li class="nav-item">
