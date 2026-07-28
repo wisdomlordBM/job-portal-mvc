@@ -7,6 +7,7 @@ using Jobportalwebsite.Hubs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 // Configure logging for SignalR
@@ -53,7 +54,7 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     services.AddScoped<IUserHelper, UserHelper>();
     services.AddScoped<NotificationService>();
     services.AddScoped<FileStorageService>();
-    // Configure DbContext to use SQL Server
+    // Configure DbContext to use PostgreSQL (Neon)
     services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
     // Configure Identity services
@@ -131,6 +132,17 @@ async Task ApplyMigrationsAndSeedRolesAsync(WebApplication app)
 }
 void ConfigureMiddleware(WebApplication app)
 {
+    // Render (and most hosts) terminate HTTPS at a reverse proxy, then forward plain HTTP
+    // to the app. Without this, ASP.NET Core thinks every request is HTTP, which breaks
+    // HTTPS-only checks like OAuth redirect URI validation (Google, etc.).
+    var forwardedHeaderOptions = new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    };
+    forwardedHeaderOptions.KnownNetworks.Clear();
+    forwardedHeaderOptions.KnownProxies.Clear();
+    app.UseForwardedHeaders(forwardedHeaderOptions);
+
     if (!app.Environment.IsDevelopment())
     {
         app.UseExceptionHandler("/Home/Error");
