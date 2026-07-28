@@ -1,0 +1,15 @@
+{
+  "name": "CareerNest",
+  "short_name": "CareerNest",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#12bcaa",
+  "theme_color": "#12bcaa",
+  "icons": [
+    {
+      "src": "/images/icon1.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    }
+  ]
+}
