@@ -5,6 +5,10 @@
         ? "/images/default-company-logo.png"
         : Model.Company.ProfilePicturePath;
 }
+@{
+    bool isOwnProfile = ViewBag.IsOwnProfile ?? false;
+    Layout = isOwnProfile ? "~/Views/Shared/_Jobseekers.cshtml" : "~/Views/Shared/_Layout.cshtml";
+}
 
 <div class="container my-5" style="max-width: 800px;">
     <div class="card shadow-sm rounded-4 p-4 mb-4">
