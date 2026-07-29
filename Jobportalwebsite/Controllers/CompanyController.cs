@@ -16,20 +16,25 @@ namespace Jobportalwebsite.Controllers
     public class CompanyController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly NotificationService _notificationService;  // Notification service field
-        private readonly UserManager<ApplicationUser> _userManager; // Inject UserManager
+        private readonly NotificationService _notificationService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly FileStorageService _fileStorageService; // Inject UserManager
 
         private static readonly string[] AllowedImageExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
         private const long MaxImageSizeBytes = 5 * 1024 * 1024; // 5 MB
 
         // Constructor to inject ApplicationDbContext and NotificationService
-        public CompanyController(ApplicationDbContext context, NotificationService notificationService, UserManager<ApplicationUser> userManager)
+        public CompanyController(
+             ApplicationDbContext context,
+             NotificationService notificationService,
+             UserManager<ApplicationUser> userManager,
+             FileStorageService fileStorageService)
         {
             _context = context;
-            _notificationService = notificationService;  // Assign the notification service
+            _notificationService = notificationService;
             _userManager = userManager;
+            _fileStorageService = fileStorageService;
         }
-
 
         // GET: Company/Create
         public IActionResult Create()
@@ -496,18 +501,7 @@ namespace Jobportalwebsite.Controllers
 
         private async Task<string> SaveCompanyImageAsync(IFormFile file, string subfolder)
         {
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "companies", subfolder);
-            Directory.CreateDirectory(uploadsFolder);
-
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return $"/uploads/companies/{subfolder}/{fileName}";
+            return await _fileStorageService.UploadImageAsync(file, $"companies/{subfolder}");
         }
 
         // GET: Company/Edit/5
