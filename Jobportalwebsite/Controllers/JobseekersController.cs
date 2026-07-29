@@ -22,17 +22,20 @@ namespace Jobportalwebsite.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly NotificationService _notificationService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly FileStorageService _fileStorageService;
 
         public JobseekersController(
             ApplicationDbContext context,
             IWebHostEnvironment environment,
             NotificationService notificationService,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            FileStorageService fileStorageService)
         {
             _context = context;
             _environment = environment;
             _notificationService = notificationService;
             _userManager = userManager;
+            _fileStorageService = fileStorageService;
         }
         public IActionResult Index()
         {
@@ -205,21 +208,7 @@ namespace Jobportalwebsite.Controllers
 
                 if (CV != null)
                 {
-                    var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "cvs");
-                    if (!Directory.Exists(uploadPath))
-                    {
-                        Directory.CreateDirectory(uploadPath);
-                    }
-
-                    var uniqueFileName = Guid.NewGuid() + Path.GetExtension(CV.FileName);
-                    var filePath = Path.Combine(uploadPath, uniqueFileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await CV.CopyToAsync(stream);
-                    }
-
-                    myApplication.CVPath = "/uploads/cvs/" + uniqueFileName;
+                    myApplication.CVPath = await _fileStorageService.UploadRawFileAsync(CV, "cvs");
                     _context.Update(myApplication);
                     await _context.SaveChangesAsync();
                 }
@@ -259,21 +248,7 @@ namespace Jobportalwebsite.Controllers
                 return NotFound();
             }
 
-            var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "cvs");
-            if (!Directory.Exists(uploadPath))
-            {
-                Directory.CreateDirectory(uploadPath);
-            }
-
-            var uniqueFileName = Guid.NewGuid() + Path.GetExtension(model.CV.FileName);
-            var filePath = Path.Combine(uploadPath, uniqueFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await model.CV.CopyToAsync(stream);
-            }
-
-            application.CVPath = "/uploads/cvs/" + uniqueFileName;
+            application.CVPath = await _fileStorageService.UploadRawFileAsync(model.CV, "cvs");
             _context.Update(application);
             await _context.SaveChangesAsync();
 
@@ -328,18 +303,7 @@ namespace Jobportalwebsite.Controllers
 
             if (profilePicture != null && profilePicture.Length > 0)
             {
-                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
-                Directory.CreateDirectory(uploadsFolder);
-
-                var fileName = Guid.NewGuid() + Path.GetExtension(profilePicture.FileName);
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await profilePicture.CopyToAsync(stream);
-                }
-
-                user.ProfilePicturePath = "/uploads/" + fileName;
+                user.ProfilePicturePath = await _fileStorageService.UploadImageAsync(profilePicture, "jobseekers/profile-pictures");
             }
 
             _context.Users.Update(user);

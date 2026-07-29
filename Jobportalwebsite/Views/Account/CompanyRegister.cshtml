@@ -53,26 +53,16 @@
             <!-- Other form content -->
 
             <div class="text-center mt-4">
-                <p>Or login with:</p>
-                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                <div class="d-flex align-items-center mb-3">
+                    <hr class="flex-grow-1">
+                    <span class="px-2 text-muted small">or</span>
+                    <hr class="flex-grow-1">
+                </div>
+                <form asp-action="ExternalLogin" method="post">
                     <input type="hidden" name="provider" value="Google" />
                     <input type="hidden" name="role" value="Company" />
-                    <button type="submit" class="btn btn-outline-danger">
-                        <i class="fab fa-google"></i> Google
-                    </button>
-                </form>
-                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
-                    <input type="hidden" name="provider" value="Facebook" />
-                    <input type="hidden" name="role" value="Company" />
-                    <button type="submit" class="btn btn-outline-primary">
-                        <i class="fab fa-facebook"></i> Facebook
-                    </button>
-                </form>
-                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
-                    <input type="hidden" name="provider" value="Microsoft" />
-                    <input type="hidden" name="role" value="Company" />
-                    <button type="submit" class="btn btn-outline-secondary">
-                        <i class="fab fa-microsoft"></i> Microsoft
+                    <button type="submit" class="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="fab fa-google"></i> Continue with Google
                     </button>
                 </form>
             </div>
